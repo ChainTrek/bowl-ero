@@ -1,0 +1,26 @@
+.admin-sidebar {
+  background-color: #111827;
+  color: #ffffff;
+  padding: 1.5rem;
+
+  &__brand {
+    margin-bottom: 2rem;
+  }
+
+  &__nav {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  &__nav a {
+    display: block;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease;
+  }
+
+  &__nav a:hover,
+  &__nav a.active {
+    background-color: #1f2937;
+  }
+}
