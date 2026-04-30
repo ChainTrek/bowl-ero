@@ -22,6 +22,9 @@ export default function AdminSidebar(){
         <NavLink to='/admin/hours'>
           Hours
         </NavLink>
+        <NavLink to='/admin/announcements'>
+          Announcements
+        </NavLink>
       </nav>
     </aside>
   )

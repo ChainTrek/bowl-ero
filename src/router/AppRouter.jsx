@@ -6,6 +6,7 @@ import MessagesPage from '../pages/admin/MessagesPage'
 import LeaguesPage from '../pages/admin/LeaguesPage'
 import ScoresPage from '../pages/admin/ScoresPage'
 import HoursPage from '../pages/admin/HoursPage'
+import AnnouncementsPage from '../pages/admin/AnnouncementsPage'
 
 export default function AppRouter(){
   return(
@@ -18,6 +19,7 @@ export default function AppRouter(){
           <Route path='leagues' element={<LeaguesPage />} />
           <Route path='scores' element={<ScoresPage />} />
           <Route path='hours' element={<HoursPage />} />
+          <Route path='announcements' element={<AnnouncementsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
