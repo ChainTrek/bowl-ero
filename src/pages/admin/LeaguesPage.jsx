@@ -20,10 +20,6 @@ export default function LeaguesPage() {
   const [submitting, setSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
 
-  useEffect(() => {
-    loadLeagues();
-  }, []);
-
   async function loadLeagues() {
     try {
       setLoading(true);
@@ -35,6 +31,10 @@ export default function LeaguesPage() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    loadLeagues();
+  }, []);
 
   function handleChange(event) {
     const { name, value, type, checked } = event.target;
