@@ -1,59 +1,90 @@
-import { supabase } from './client'
+import { supabase } from './client';
 
-const BUCKET_NAME = 'announcements'
+const BUCKET_NAME = 'announcements';
 
 function createFilePath(file) {
-  const fileExt = file.name.split('.').pop()
-  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`
-  return `uploads/${fileName}`
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+  return `uploads/${fileName}`;
 }
 
 export async function getAnnouncements() {
-  const { data, error } = await supabase.from('announcements').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: false })
+  const { data, error } = await supabase
+    .from('announcements')
+    .select('*')
+    .order('is_active', { ascending: false })
+    .order('display_order', { ascending: true })
+    .order('created_at', { ascending: false });
 
-  if(error) {
-    throw new Error(error.message)
+  if (error) {
+    throw new Error(error.message);
   }
 
-  return data
+  return data;
 }
 
 export async function uploadAnnouncementImage(file) {
-  const filePath = createFilePath(file)
-  const { error: uploadError } = await supabase.storage.from(BUCKET_NAME).upload(filePath, file, {
-    cacheControl: '3600',
-    upsert: false,
-    contentType: file.type
-  })
+  const filePath = createFilePath(file);
 
-  if(uploadError) {
-    throw new Error(uploadError.message)
+  const { error: uploadError } = await supabase.storage
+    .from(BUCKET_NAME)
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: file.type,
+    });
+
+  if (uploadError) {
+    throw new Error(uploadError.message);
   }
 
-  const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(filePath)
+  const { data } = supabase.storage
+    .from(BUCKET_NAME)
+    .getPublicUrl(filePath);
 
-  return{
+  return {
     imagePath: filePath,
     imageUrl: data.publicUrl,
-  }
+  };
 }
 
 export async function createAnnouncement(announcementData) {
-  const { data, error } = await supabase.from('announcements').insert([announcementData]).select()
+  const { data, error } = await supabase
+    .from('announcements')
+    .insert([announcementData])
+    .select();
 
-  if(error) {
-    throw new Error(error.message)
+  if (error) {
+    throw new Error(error.message);
   }
 
-  return data[0]
+  return data[0];
 }
 
 export async function updateAnnouncement(id, updates) {
-  const { data, error } = await supabase.from('announcements').update(updates).eq('id', id).select()
+  const { data, error } = await supabase
+    .from('announcements')
+    .update(updates)
+    .eq('id', id)
+    .select();
 
-  if(error) {
-    throw new Error(error.message)
+  if (error) {
+    throw new Error(error.message);
   }
 
-  return data[0]
+  return data[0];
+}
+
+export async function toggleAnnouncementActive(id, isActive) {
+  const { data, error } = await supabase
+    .from('announcements')
+    .update({ is_active: !isActive })
+    .eq('id', id)
+    .select();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data[0];
 }
