@@ -4,7 +4,7 @@ export default function AdminSidebar(){
   return(
     <aside className="admin-sidebar">
       <div className="admin-sidebar__brand">
-        <h2>Bowl-ero Admin</h2>
+        <h2><NavLink to='/'>Bowl-ero</NavLink> Admin</h2>
       </div>
       <nav className="admin-sidebar__nav">
         <NavLink to='/admin' end>
@@ -16,6 +16,9 @@ export default function AdminSidebar(){
         <NavLink to='/admin/leagues'>
           Leagues
         </NavLink>
+        <NavLink to='/admin/tournaments'>
+          Tournaments
+        </NavLink>
         <NavLink to='/admin/scores'>
           Scores
         </NavLink>
@@ -24,6 +27,9 @@ export default function AdminSidebar(){
         </NavLink>
         <NavLink to='/admin/announcements'>
           Announcements
+        </NavLink>
+        <NavLink to='/admin/cafe-menu'>
+          Cafe Menu
         </NavLink>
       </nav>
     </aside>

@@ -76,3 +76,45 @@ export async function updateLeagueWeek(id, updates) {
 
   return data[0];
 }
+
+export async function getPlayerScoresByWeek(leagueWeekId) {
+  const { data, error } = await supabase
+    .from('player_scores')
+    .select('*')
+    .eq('league_week_id', leagueWeekId)
+    .order('display_order', { ascending: true })
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function createPlayerScore(scoreData) {
+  const { data, error } = await supabase
+    .from('player_scores')
+    .insert([scoreData])
+    .select();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data[0];
+}
+
+export async function updatePlayerScore(id, updates) {
+  const { data, error } = await supabase
+    .from('player_scores')
+    .update(updates)
+    .eq('id', id)
+    .select();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data[0];
+}
