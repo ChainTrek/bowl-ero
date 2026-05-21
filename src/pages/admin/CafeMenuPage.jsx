@@ -10,8 +10,6 @@ import {
 const initialForm = {
   name: '',
   description: '',
-  price: '',
-  category: '',
   is_active: true,
   display_order: 0,
 };
@@ -103,8 +101,6 @@ export default function CafeMenuPage() {
     setFormData({
       name: item.name || '',
       description: item.description || '',
-      price: item.price ?? '',
-      category: item.category || '',
       is_active: item.is_active,
       display_order: item.display_order ?? 0,
     });
@@ -127,7 +123,7 @@ export default function CafeMenuPage() {
     event.preventDefault();
 
     if (!formData.name.trim()) {
-      setStatusMessage('Menu item name is required.');
+      setStatusMessage('Menu item title is required.');
       return;
     }
 
@@ -139,8 +135,6 @@ export default function CafeMenuPage() {
         const updatedItem = await updateCafeMenuItem(editingItemId, {
           name: formData.name.trim(),
           description: formData.description.trim() || null,
-          price: formData.price === '' ? null : Number(formData.price),
-          category: formData.category.trim() || null,
           is_active: formData.is_active,
           display_order: Number(formData.display_order) || 0,
         });
@@ -164,8 +158,6 @@ export default function CafeMenuPage() {
         const newItem = await createCafeMenuItem({
           name: formData.name.trim(),
           description: formData.description.trim() || null,
-          price: formData.price === '' ? null : Number(formData.price),
-          category: formData.category.trim() || null,
           image_path: imagePath,
           image_url: imageUrl,
           is_active: formData.is_active,
@@ -224,7 +216,7 @@ export default function CafeMenuPage() {
     <section className="admin-page cafe-menu-page">
       <div className="admin-page__header">
         <h1>Cafe Menu</h1>
-        <p>Add cafe items and upload images without changing code.</p>
+        <p>Add full menu images without changing code.</p>
       </div>
 
       <div className="admin-card">
@@ -232,14 +224,14 @@ export default function CafeMenuPage() {
 
         <form className="menu-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="name">Menu Item Name</label>
+            <label htmlFor="name">Menu Title</label>
             <input
               id="name"
               name="name"
               type="text"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Cheeseburger"
+              placeholder="Cafe Menu"
             />
           </div>
 
@@ -253,34 +245,6 @@ export default function CafeMenuPage() {
               onChange={handleChange}
               placeholder="Optional description"
             />
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="price">Price</label>
-              <input
-                id="price"
-                name="price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData.price}
-                onChange={handleChange}
-                placeholder="8.99"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="category">Category</label>
-              <input
-                id="category"
-                name="category"
-                type="text"
-                value={formData.category}
-                onChange={handleChange}
-                placeholder="Burgers"
-              />
-            </div>
           </div>
 
           <div className="form-row">
@@ -325,7 +289,7 @@ export default function CafeMenuPage() {
 
           {editingItemId && (
             <p className="helper-text">
-              Image replacement is not included yet. This edit mode updates the menu item details only.
+              Image replacement is not included yet. This edit mode updates the title and description only.
             </p>
           )}
 
@@ -384,10 +348,6 @@ export default function CafeMenuPage() {
 
                 <div className="menu-item-admin__content">
                   <h3>{item.name}</h3>
-                  {item.category && <p>Category: {item.category}</p>}
-                  {item.price !== null && item.price !== undefined && (
-                    <p>Price: ${Number(item.price).toFixed(2)}</p>
-                  )}
                   {item.description && <p>{item.description}</p>}
 
                   <div className="menu-item-admin__actions">

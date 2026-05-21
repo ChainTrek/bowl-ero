@@ -105,6 +105,19 @@ export async function createPlayerScore(scoreData) {
   return data[0];
 }
 
+export async function createMultiplePlayerScores(scoreRows) {
+  const { data, error } = await supabase
+    .from('player_scores')
+    .insert(scoreRows)
+    .select();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
 export async function updatePlayerScore(id, updates) {
   const { data, error } = await supabase
     .from('player_scores')

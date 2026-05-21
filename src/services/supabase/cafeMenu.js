@@ -12,7 +12,6 @@ export async function getCafeMenuItems() {
   const { data, error } = await supabase
     .from('cafe_menu_items')
     .select('*')
-    .order('category', { ascending: true, nullsFirst: false })
     .order('display_order', { ascending: true })
     .order('name', { ascending: true });
 

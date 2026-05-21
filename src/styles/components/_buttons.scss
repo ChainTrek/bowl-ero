@@ -1,0 +1,29 @@
+.secondary-button {
+  padding: 0.75rem 1.25rem;
+  border: 1px solid #cbd2d9;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.edit-button,
+.warning-button,
+.success-button {
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.edit-button {
+  background-color: #1d4ed8;
+}
+
+.warning-button {
+  background-color: #b45309;
+}
+
+.success-button {
+  background-color: #15803d;
+}

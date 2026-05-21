@@ -1,86 +1,146 @@
-import { useEffect, useMemo, useState } from 'react';
-import { getPublicCafeMenuItems } from '../../services/supabase/publicCafeMenu';
+import { useEffect, useState, useCallback, useRef } from 'react'
+import useEmblaCarousel from 'embla-carousel-react'
+import Autoplay from 'embla-carousel-autoplay'
+import { getPublicCafeMenuItems } from '../../services/supabase/publicCafeMenu'
 
 export default function CafeMenuSection() {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
+	const [items, setItems] = useState([])
+	const [loading, setLoading] = useState(true)
+	const [errorMessage, setErrorMessage] = useState('')
+	const [selectedIndex, setSelectedIndex] = useState(0)
 
-  useEffect(() => {
-    async function loadMenuItems() {
-      try {
-        setLoading(true);
-        const data = await getPublicCafeMenuItems();
-        setItems(data);
-      } catch (error) {
-        setErrorMessage(`Unable to load cafe menu: ${error.message}`);
-      } finally {
-        setLoading(false);
-      }
-    }
+	const autoplay = useRef(
+		Autoplay({
+			delay: 5000,
+			stopOnInteraction: false,
+			stopOnMouseEnter: true,
+			stopOnFocusIn: true,
+		}),
+	)
 
-    loadMenuItems();
-  }, []);
+	const [emblaRef, emblaApi] = useEmblaCarousel(
+		{
+			loop: items.length > 1,
+			align: 'start',
+		},
+		items.length > 1 ? [autoplay.current] : [],
+	)
 
-  const groupedItems = useMemo(() => {
-    return items.reduce((groups, item) => {
-      const category = item.category || 'Menu Items';
+	useEffect(() => {
+		async function loadMenuItems() {
+			try {
+				setLoading(true)
+				const data = await getPublicCafeMenuItems()
+				setItems(data)
+			} catch (error) {
+				setErrorMessage(`Unable to load cafe menu: ${error.message}`)
+			} finally {
+				setLoading(false)
+			}
+		}
 
-      if (!groups[category]) {
-        groups[category] = [];
-      }
+		loadMenuItems()
+	}, [])
 
-      groups[category].push(item);
-      return groups;
-    }, {});
-  }, [items]);
+	const onSelect = useCallback(() => {
+		if (!emblaApi) return
+		setSelectedIndex(emblaApi.selectedScrollSnap())
+	}, [emblaApi])
 
-  return (
-    <section className="cafe-menu-section">
-      <div className="cafe-menu-section__inner">
-        <h2>Cafe Menu</h2>
+	useEffect(() => {
+		if (!emblaApi) return
 
-        {loading ? (
-          <p>Loading menu...</p>
-        ) : errorMessage ? (
-          <p>{errorMessage}</p>
-        ) : items.length === 0 ? (
-          <p>No menu items available right now.</p>
-        ) : (
-          <div className="cafe-menu-section__groups">
-            {Object.entries(groupedItems).map(([category, categoryItems]) => (
-              <div className="cafe-menu-group" key={category}>
-                <h3>{category}</h3>
+		onSelect()
+		emblaApi.on('select', onSelect)
+		emblaApi.on('reInit', onSelect)
 
-                <div className="cafe-menu-grid">
-                  {categoryItems.map((item) => (
-                    <article className="menu-card" key={item.id}>
-                      {item.image_url && (
-                        <img
-                          className="menu-card__image"
-                          src={item.image_url}
-                          alt={item.name}
-                        />
-                      )}
+		return () => {
+			emblaApi.off('select', onSelect)
+			emblaApi.off('reInit', onSelect)
+		}
+	}, [emblaApi, onSelect])
 
-                      <div className="menu-card__content">
-                        <div className="menu-card__header">
-                          <h4>{item.name}</h4>
-                          {item.price !== null && item.price !== undefined && (
-                            <span>${Number(item.price).toFixed(2)}</span>
-                          )}
-                        </div>
+	function handlePrev() {
+		if (!emblaApi) return
+		emblaApi.scrollPrev()
+	}
 
-                        {item.description && <p>{item.description}</p>}
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
-  );
+	function handleNext() {
+		if (!emblaApi) return
+		emblaApi.scrollNext()
+	}
+
+	function handleDotClick(index) {
+		if (!emblaApi) return
+		emblaApi.scrollTo(index)
+	}
+
+	return (
+		<section className='cafe-menu-section'>
+			<div className='cafe-menu-section__inner'>
+				<h2>Cafe Menu</h2>
+
+				{loading ? (
+					<p>Loading menu...</p>
+				) : errorMessage ? (
+					<p>{errorMessage}</p>
+				) : items.length === 0 ? (
+					<p>No menu items available right now.</p>
+				) : (
+					<div className='cafe-carousel'>
+						<div className='cafe-carousel__viewport' ref={emblaRef}>
+							<div className='cafe-carousel__container'>
+								{items.map(item => (
+									<div className='cafe-carousel__slide' key={item.id}>
+										<article className='cafe-slide-card'>
+											{item.image_url && (
+												<div className='cafe-slide-card__image-wrapper'>
+													<img
+														className='cafe-slide-card__image'
+														src={item.image_url}
+														alt={item.name}
+													/>
+												</div>
+											)}
+
+											<div className='cafe-slide-card__details'>
+												<h3>{item.name}</h3>
+												{item.description && <p>{item.description}</p>}
+											</div>
+										</article>
+									</div>
+								))}
+							</div>
+						</div>
+
+						{items.length > 1 && (
+							<div className='cafe-carousel__controls'>
+								<button type='button' className='cafe-carousel__button' onClick={handlePrev}>
+									Previous
+								</button>
+
+								<div className='cafe-carousel__dots'>
+									{items.map((item, index) => (
+										<button
+											key={item.id}
+											type='button'
+											className={`cafe-carousel__dot ${
+												index === selectedIndex ? 'cafe-carousel__dot--active' : ''
+											}`}
+											onClick={() => handleDotClick(index)}
+											aria-label={`Go to cafe item ${index + 1}`}
+										/>
+									))}
+								</div>
+
+								<button type='button' className='cafe-carousel__button' onClick={handleNext}>
+									Next
+								</button>
+							</div>
+						)}
+					</div>
+				)}
+			</div>
+		</section>
+	)
 }

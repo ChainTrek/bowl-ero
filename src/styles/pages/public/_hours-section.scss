@@ -1,0 +1,53 @@
+.hours-section {
+  padding: 2rem;
+
+  &__inner {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  h2 {
+    margin-bottom: 1.5rem;
+  }
+
+  &__list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  &__item:last-child {
+    border-bottom: none;
+  }
+
+  &__day {
+    font-weight: 600;
+  }
+
+  &__time {
+    color: #52606d;
+    text-align: right;
+  }
+}
+
+@media (max-width: 640px) {
+  .hours-section__item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hours-section__time {
+    text-align: left;
+  }
+}

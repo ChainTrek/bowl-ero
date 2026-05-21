@@ -1,0 +1,68 @@
+.league-scores-section {
+  padding: 2rem;
+
+  &__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  h2 {
+    margin-bottom: 1.5rem;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+.league-score-card {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  display: grid;
+  gap: 1rem;
+
+  &__header {
+    h3 {
+      margin: 0 0 0.35rem;
+    }
+
+    p {
+      margin: 0;
+      color: #52606d;
+    }
+  }
+
+  &__week {
+    p {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    small {
+      color: #52606d;
+    }
+  }
+
+  &__scores {
+    display: grid;
+    gap: 0.5rem;
+
+    p {
+      margin: 0;
+      padding: 0.6rem 0.75rem;
+      border-radius: 0.5rem;
+      background-color: #f8fafc;
+      line-height: 1.5;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .league-scores-section__grid {
+    grid-template-columns: 1fr;
+  }
+}

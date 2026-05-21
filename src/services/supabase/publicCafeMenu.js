@@ -5,7 +5,6 @@ export async function getPublicCafeMenuItems() {
     .from('cafe_menu_items')
     .select('*')
     .eq('is_active', true)
-    .order('category', { ascending: true, nullsFirst: false })
     .order('display_order', { ascending: true })
     .order('name', { ascending: true });
 

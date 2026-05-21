@@ -6,6 +6,7 @@ import {
   updateLeagueWeek,
   getPlayerScoresByWeek,
   createPlayerScore,
+  createMultiplePlayerScores,
   updatePlayerScore,
 } from '../../services/supabase/scores';
 import { formatScoreLine } from '../../utils/formatScoreLine';
@@ -26,8 +27,43 @@ const initialScoreForm = {
   display_order: 0,
 };
 
+function createBulkRow(index = 0) {
+  return {
+    tempId: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    player_name: '',
+    average: '',
+    game1: '',
+    game2: '',
+    game3: '',
+    series: '',
+    display_order: index,
+  };
+}
+
 function normalizeNumber(value) {
   return value === '' ? null : Number(value);
+}
+
+function buildScorePayload(row, selectedWeekId) {
+  return {
+    league_week_id: selectedWeekId,
+    player_name: row.player_name.trim(),
+    average: normalizeNumber(row.average),
+    game1: normalizeNumber(row.game1),
+    game2: normalizeNumber(row.game2),
+    game3: normalizeNumber(row.game3),
+    series: normalizeNumber(row.series),
+    display_order: normalizeNumber(row.display_order) ?? 0,
+  };
+}
+
+function isBulkRowValid(row) {
+  const playerNameOk = row.player_name.trim() !== '';
+  const gamesEntered = [row.game1, row.game2, row.game3].filter(
+    (game) => game !== ''
+  ).length;
+
+  return playerNameOk && gamesEntered > 0;
 }
 
 export default function ScoresPage() {
@@ -43,10 +79,13 @@ export default function ScoresPage() {
   const [scoreFormData, setScoreFormData] = useState(initialScoreForm);
   const [editingScoreId, setEditingScoreId] = useState(null);
 
+  const [bulkRows, setBulkRows] = useState([createBulkRow(0), createBulkRow(1), createBulkRow(2)]);
+
   const [loading, setLoading] = useState(true);
   const [scoreLoading, setScoreLoading] = useState(false);
   const [submittingWeek, setSubmittingWeek] = useState(false);
   const [submittingScore, setSubmittingScore] = useState(false);
+  const [submittingBulk, setSubmittingBulk] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
 
   const selectedWeek = useMemo(
@@ -116,6 +155,29 @@ export default function ScoresPage() {
       ...prev,
       [name]: value,
     }));
+  }
+
+  function handleBulkChange(tempId, field, value) {
+    setBulkRows((prev) =>
+      prev.map((row) =>
+        row.tempId === tempId ? { ...row, [field]: value } : row
+      )
+    );
+  }
+
+  function addBulkRow() {
+    setBulkRows((prev) => [...prev, createBulkRow(prev.length)]);
+  }
+
+  function removeBulkRow(tempId) {
+    setBulkRows((prev) => {
+      if (prev.length === 1) return prev;
+      return prev.filter((row) => row.tempId !== tempId);
+    });
+  }
+
+  function resetBulkRows() {
+    setBulkRows([createBulkRow(0), createBulkRow(1), createBulkRow(2)]);
   }
 
   function handleEditWeekClick(week) {
@@ -280,6 +342,38 @@ export default function ScoresPage() {
     }
   }
 
+  async function handleBulkSubmit(event) {
+    event.preventDefault();
+
+    if (!selectedWeekId) {
+      setStatusMessage('Please select a weekly entry first.');
+      return;
+    }
+
+    const validRows = bulkRows.filter(isBulkRowValid);
+
+    if (validRows.length === 0) {
+      setStatusMessage('Enter at least one valid score row before saving.');
+      return;
+    }
+
+    try {
+      setSubmittingBulk(true);
+      setStatusMessage('');
+
+      const payload = validRows.map((row) => buildScorePayload(row, selectedWeekId));
+      const insertedRows = await createMultiplePlayerScores(payload);
+
+      setPlayerScores((prev) => [...prev, ...insertedRows]);
+      resetBulkRows();
+      setStatusMessage(`${insertedRows.length} player score row(s) added successfully.`);
+    } catch (error) {
+      setStatusMessage(`Error adding bulk player scores: ${error.message}`);
+    } finally {
+      setSubmittingBulk(false);
+    }
+  }
+
   const livePreview = formatScoreLine({
     player_name: scoreFormData.player_name,
     average: scoreFormData.average,
@@ -415,7 +509,7 @@ export default function ScoresPage() {
 
       <div className="admin-card">
         <h2>
-          {editingScoreId ? 'Edit Player Score' : 'Add Player Score'}
+          {editingScoreId ? 'Edit Player Score' : 'Add Single Player Score'}
           {selectedWeek ? ` — ${selectedWeek.week_label}` : ''}
         </h2>
 
@@ -540,6 +634,151 @@ export default function ScoresPage() {
                 )}
               </div>
             </form>
+
+            <div className="bulk-score-entry">
+              <div className="bulk-score-entry__header">
+                <h3>Bulk Score Entry</h3>
+                <p>Add multiple bowlers at once for this weekly entry.</p>
+              </div>
+
+              <form onSubmit={handleBulkSubmit} className="bulk-score-form">
+                <div className="bulk-score-list">
+                  {bulkRows.map((row, index) => (
+                    <div className="bulk-score-row" key={row.tempId}>
+                      <div className="bulk-score-row__top">
+                        <h4>Row {index + 1}</h4>
+                        <button
+                          type="button"
+                          className="secondary-button"
+                          onClick={() => removeBulkRow(row.tempId)}
+                          disabled={bulkRows.length === 1}
+                        >
+                          Remove
+                        </button>
+                      </div>
+
+                      <div className="bulk-score-grid">
+                        <div className="form-group">
+                          <label>Player Name</label>
+                          <input
+                            type="text"
+                            value={row.player_name}
+                            onChange={(event) =>
+                              handleBulkChange(row.tempId, 'player_name', event.target.value)
+                            }
+                            placeholder="John Doe"
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label>Average</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="300"
+                            value={row.average}
+                            onChange={(event) =>
+                              handleBulkChange(row.tempId, 'average', event.target.value)
+                            }
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label>Game 1</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="300"
+                            value={row.game1}
+                            onChange={(event) =>
+                              handleBulkChange(row.tempId, 'game1', event.target.value)
+                            }
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label>Game 2</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="300"
+                            value={row.game2}
+                            onChange={(event) =>
+                              handleBulkChange(row.tempId, 'game2', event.target.value)
+                            }
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label>Game 3</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="300"
+                            value={row.game3}
+                            onChange={(event) =>
+                              handleBulkChange(row.tempId, 'game3', event.target.value)
+                            }
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label>Series</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="900"
+                            value={row.series}
+                            onChange={(event) =>
+                              handleBulkChange(row.tempId, 'series', event.target.value)
+                            }
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label>Display Order</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={row.display_order}
+                            onChange={(event) =>
+                              handleBulkChange(row.tempId, 'display_order', event.target.value)
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <div className="score-preview">
+                        <h3>Preview</h3>
+                        <p>{formatScoreLine(row)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="form-actions">
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={addBulkRow}
+                  >
+                    Add Another Row
+                  </button>
+
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={resetBulkRows}
+                  >
+                    Reset Bulk Form
+                  </button>
+
+                  <button type="submit" disabled={submittingBulk}>
+                    {submittingBulk ? 'Saving Bulk Scores...' : 'Save Bulk Scores'}
+                  </button>
+                </div>
+              </form>
+            </div>
 
             <div className="player-score-list-wrapper">
               <h3>Current Player Scores</h3>

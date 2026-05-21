@@ -1,0 +1,134 @@
+.announcements-section {
+  padding: 2rem;
+
+  &__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  h2 {
+    margin-bottom: 1.5rem;
+  }
+}
+
+.announcement-carousel {
+  display: grid;
+  gap: 1rem;
+}
+
+.announcement-carousel__viewport {
+  overflow: hidden;
+}
+
+.announcement-carousel__container {
+  display: flex;
+}
+
+.announcement-carousel__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+.announcement-slide-card {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  &__image-wrapper {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background-color: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+  }
+
+  &__details {
+    padding: 1.25rem;
+    display: grid;
+    gap: 0.75rem;
+
+    h3,
+    p {
+      margin: 0;
+    }
+
+    p {
+      color: #52606d;
+      line-height: 1.5;
+    }
+  }
+
+  &__link {
+    display: inline-block;
+    width: fit-content;
+    padding: 0.7rem 1rem;
+    border-radius: 0.5rem;
+    background-color: #1d4ed8;
+    color: #ffffff;
+    text-decoration: none;
+  }
+}
+
+.announcement-carousel__controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.announcement-carousel__button {
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: #111827;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.announcement-carousel__dots {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex: 1;
+}
+
+.announcement-carousel__dot {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 999px;
+  background-color: #cbd5e1;
+  cursor: pointer;
+}
+
+.announcement-carousel__dot--active {
+  background-color: #1d4ed8;
+}
+
+@media (max-width: 768px) {
+  .announcement-slide-card__image-wrapper {
+    aspect-ratio: 4 / 3;
+    padding: 0.75rem;
+  }
+
+  .announcement-carousel__controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .announcement-carousel__dots {
+    justify-content: center;
+  }
+}
