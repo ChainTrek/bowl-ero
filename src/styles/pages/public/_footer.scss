@@ -1,0 +1,114 @@
+.public-footer {
+  padding: 4rem 1.5rem 2rem;
+  background:
+    linear-gradient(180deg, rgba(2, 6, 23, 0.96) 0%, rgba(15, 23, 42, 0.98) 100%);
+  color: #e2e8f0;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+
+  &__inner {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  &__top {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  &__brand {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  &__brand-text {
+    display: grid;
+    gap: 0.4rem;
+
+    h2 {
+      margin: 0;
+      color: #f8fafc;
+    }
+
+    p {
+      margin: 0;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+  }
+
+  &__nav {
+    display: grid;
+    gap: 0.6rem;
+
+    h3 {
+      margin: 0 0 0.35rem;
+      color: #f8fafc;
+    }
+
+    a {
+      color: #7dd3fc;
+      width: fit-content;
+    }
+
+    a:hover {
+      color: #ffffff;
+    }
+  }
+
+  &__hours {
+    padding-top: 0.5rem;
+  }
+
+  &__bottom {
+    padding-top: 1rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+
+    p {
+      margin: 0;
+      color: #94a3b8;
+      text-align: center;
+    }
+  }
+}
+
+.site-logo--footer {
+  width: 120px;
+  border-radius: 0.9rem;
+  box-shadow:
+    0 0 14px rgba(255, 255, 255, 0.3),
+    0 0 24px rgba(255, 255, 255, 0.12);
+}
+
+.hours-section--footer {
+  .public-section-header {
+    margin-bottom: 1.25rem;
+  }
+
+  .public-heading {
+    font-size: clamp(1.5rem, 2.2vw, 2.2rem);
+  }
+
+  .public-subheading {
+    max-width: 650px;
+  }
+}
+
+@media (max-width: 900px) {
+  .public-footer__top {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .public-footer {
+    padding: 3rem 1rem 2rem;
+  }
+
+  .public-footer__brand {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
