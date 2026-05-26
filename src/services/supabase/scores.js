@@ -131,3 +131,14 @@ export async function updatePlayerScore(id, updates) {
 
   return data[0];
 }
+
+export async function deletePlayerScore(id) {
+  const { error } = await supabase
+    .from('player_scores')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}

@@ -1,0 +1,16 @@
+.public-section-header {
+  margin-bottom: 1.75rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.public-empty,
+.public-loading,
+.public-error {
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  color: #cbd5e1;
+  backdrop-filter: blur(6px);
+}

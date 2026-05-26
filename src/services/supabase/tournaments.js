@@ -54,3 +54,14 @@ export async function toggleTournamentActive(id, isActive) {
 
   return data[0];
 }
+
+export async function deleteTournament(id) {
+  const { error } = await supabase
+    .from('tournaments')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}

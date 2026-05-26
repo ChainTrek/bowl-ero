@@ -1,13 +1,6 @@
 .hours-section {
-  padding: 2rem;
-
   &__inner {
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: #ffffff;
-    border-radius: 1rem;
     padding: 2rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   }
 
   h2 {
@@ -23,8 +16,8 @@
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.85rem 0;
-    border-bottom: 1px solid #e5e7eb;
+    padding: 0.95rem 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.16);
   }
 
   &__item:last-child {
@@ -32,11 +25,12 @@
   }
 
   &__day {
-    font-weight: 600;
+    font-weight: 700;
+    color: #f8fafc;
   }
 
   &__time {
-    color: #52606d;
+    color: #cbd5e1;
     text-align: right;
   }
 }

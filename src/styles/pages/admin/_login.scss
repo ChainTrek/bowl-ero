@@ -72,6 +72,17 @@
   }
 }
 
+.admin-login-card__logo {
+  margin-bottom: 0.5rem;
+}
+
+.admin-topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 640px) {
   .admin-topbar {
     flex-direction: column;

@@ -27,3 +27,12 @@
 .success-button {
   background-color: #15803d;
 }
+
+.danger-button {
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: #b91c1c;
+  color: #ffffff;
+  cursor: pointer;
+}

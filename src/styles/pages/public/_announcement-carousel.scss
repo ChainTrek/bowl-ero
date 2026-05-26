@@ -1,11 +1,6 @@
 .announcements-section {
   padding: 2rem;
 
-  &__inner {
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
   h2 {
     margin-bottom: 1.5rem;
   }
@@ -30,15 +25,18 @@
 }
 
 .announcement-slide-card {
-  background-color: #ffffff;
+  background: rgba(15, 23, 42, 0.58);
+  border: 1px solid rgba(148, 163, 184, 0.16);
   border-radius: 1rem;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.28);
+  backdrop-filter: blur(6px);
 
   &__image-wrapper {
     width: 100%;
     aspect-ratio: 16 / 10;
-    background-color: #f8fafc;
+    background:
+      linear-gradient(180deg, rgba(14, 165, 233, 0.08) 0%, rgba(249, 115, 22, 0.08) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -63,8 +61,12 @@
       margin: 0;
     }
 
+    h3 {
+      color: #f8fafc;
+    }
+
     p {
-      color: #52606d;
+      color: #cbd5e1;
       line-height: 1.5;
     }
   }
@@ -74,10 +76,16 @@
     width: fit-content;
     padding: 0.7rem 1rem;
     border-radius: 0.5rem;
-    background-color: #1d4ed8;
+    background: linear-gradient(90deg, #f97316 0%, #ea580c 100%);
     color: #ffffff;
     text-decoration: none;
+    box-shadow: 0 10px 20px rgba(249, 115, 22, 0.24);
   }
+}
+
+.announcement-slide-card,
+.announcement-carousel__details {
+  @extend .public-card !optional;
 }
 
 .announcement-carousel__controls {
@@ -92,9 +100,10 @@
   padding: 0.7rem 1rem;
   border: none;
   border-radius: 0.5rem;
-  background-color: #111827;
+  background: linear-gradient(90deg, #2563eb 0%, #0ea5e9 100%);
   color: #ffffff;
   cursor: pointer;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
 }
 
 .announcement-carousel__dots {
@@ -109,12 +118,18 @@
   height: 12px;
   border: none;
   border-radius: 999px;
-  background-color: #cbd5e1;
+  background-color: rgba(148, 163, 184, 0.45);
   cursor: pointer;
 }
 
 .announcement-carousel__dot--active {
-  background-color: #1d4ed8;
+  background-color: #38bdf8;
+}
+
+.announcements-section {
+  .public-section-header {
+    max-width: 760px;
+  }
 }
 
 @media (max-width: 768px) {

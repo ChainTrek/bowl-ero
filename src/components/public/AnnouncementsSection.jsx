@@ -76,16 +76,22 @@ export default function AnnouncementsSection() {
 	}
 
 	return (
-		<section className='announcements-section'>
-			<div className='announcements-section__inner'>
-				<h2>Announcements</h2>
+		<section className='announcements-section public-section public-section--accent'>
+			<div className='announcements-section__inner public-container'>
+				<div className='public-section-header'>
+					<span className='public-eyebrow'>Featured</span>
+					<h2 className='public-heading'>Announcements</h2>
+					<p className='public-subheading'>
+						Stay up to date with specials, signups, and important events happening at Bowl-Ero.
+					</p>
+				</div>
 
 				{loading ? (
-					<p>Loading announcements...</p>
+					<p className='public-loading'>Loading announcements...</p>
 				) : errorMessage ? (
-					<p>{errorMessage}</p>
+					<p className='public-error'>{errorMessage}</p>
 				) : announcements.length === 0 ? (
-					<p>No current announcements.</p>
+					<p className='public-empty'>No current announcements.</p>
 				) : (
 					<div className='announcement-carousel'>
 						<div className='announcement-carousel__viewport' ref={emblaRef}>

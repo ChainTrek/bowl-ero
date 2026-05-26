@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import bowleroLogo from '../../assets/bowlero-logo.png';
 
 export default function AdminLoginPage() {
   const { login, isAuthenticated, authLoading } = useAuth();
@@ -47,6 +48,13 @@ export default function AdminLoginPage() {
   return (
     <main className="admin-login-page">
       <section className="admin-login-card">
+        <Link to="/" className="site-logo-link admin-login-card__logo" aria-label="Go to home page">
+          <img
+            className="site-logo site-logo--login"
+            src={bowleroLogo}
+            alt="Bowlero logo"
+          />
+        </Link>
         <h1>Admin Login</h1>
         <p>Sign in to manage Bowl-Ero site content.</p>
 

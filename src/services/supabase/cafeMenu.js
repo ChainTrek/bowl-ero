@@ -87,3 +87,14 @@ export async function toggleCafeMenuItemActive(id, isActive) {
 
   return data[0];
 }
+
+export async function deleteCafeMenuItem(id) {
+  const { error } = await supabase
+    .from('cafe_menu_items')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}

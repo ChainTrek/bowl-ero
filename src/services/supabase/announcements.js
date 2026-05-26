@@ -88,3 +88,14 @@ export async function toggleAnnouncementActive(id, isActive) {
 
   return data[0];
 }
+
+export async function deleteAnnouncement(id) {
+  const { error } = await supabase
+    .from('announcements')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}

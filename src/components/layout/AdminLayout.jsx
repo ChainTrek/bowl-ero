@@ -1,6 +1,7 @@
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
 import { useAuth } from '../../context/AuthContext';
+import bowleroLogo from '../../assets/bowlero-logo.png';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
@@ -20,6 +21,14 @@ export default function AdminLayout() {
       <main className="admin-layout__content">
         <div className="admin-topbar">
           <div>
+            <Link to="/" className="site-logo-link" aria-label="Go to home page">
+              <img
+                className="site-logo site-logo--admin"
+                src={bowleroLogo}
+                alt="Bowlero logo"
+              />
+            </Link>
+            
             <p>Signed in as {user?.email}</p>
           </div>
 

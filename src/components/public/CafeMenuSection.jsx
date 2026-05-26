@@ -76,16 +76,22 @@ export default function CafeMenuSection() {
 	}
 
 	return (
-		<section className='cafe-menu-section'>
-			<div className='cafe-menu-section__inner'>
-				<h2>Cafe Menu</h2>
+		<section className='cafe-menu-section public-section'>
+			<div className='cafe-menu-section__inner public-container'>
+				<div className="public-section-header">
+					<span className="public-eyebrow">Food & Drinks</span>
+					<h2 className='public-heading'>Cafe Menu</h2>
+					<p className="public-subheading">
+						Browse featured menu boards from the cafe carousel.
+					</p>
+				</div>
 
 				{loading ? (
-					<p>Loading menu...</p>
+					<p className='public-loading'>Loading menu...</p>
 				) : errorMessage ? (
-					<p>{errorMessage}</p>
+					<p className='public-error'>{errorMessage}</p>
 				) : items.length === 0 ? (
-					<p>No menu items available right now.</p>
+					<p className='public-empty'>No menu items available right now.</p>
 				) : (
 					<div className='cafe-carousel'>
 						<div className='cafe-carousel__viewport' ref={emblaRef}>

@@ -1,15 +1,4 @@
 .tournaments-section {
-  padding: 2rem;
-
-  &__inner {
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
-  h2 {
-    margin-bottom: 1.5rem;
-  }
-
   &__list {
     display: grid;
     gap: 1rem;
@@ -17,10 +6,10 @@
 }
 
 .tournament-card {
-  background-color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 1rem;
   padding: 1.25rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 
   &__content {
     display: grid;
@@ -32,8 +21,12 @@
     margin: 0;
   }
 
+  h3 {
+    color: #f8fafc;
+  }
+
   p {
-    color: #52606d;
+    color: #cbd5e1;
     line-height: 1.5;
   }
 
@@ -42,8 +35,15 @@
     width: fit-content;
     padding: 0.7rem 1rem;
     border-radius: 0.5rem;
-    background-color: #1d4ed8;
+    background: linear-gradient(90deg, #2563eb 0%, #0ea5e9 100%);
     color: #ffffff;
     text-decoration: none;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+  }
+}
+
+.tournaments-section {
+  .public-section-header {
+    max-width: 760px;
   }
 }
