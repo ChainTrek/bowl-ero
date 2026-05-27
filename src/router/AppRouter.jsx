@@ -11,12 +11,14 @@ import HoursPage from '../pages/admin/HoursPage';
 import AnnouncementsPage from '../pages/admin/AnnouncementsPage';
 import TournamentsPage from '../pages/admin/TournamentsPage';
 import CafeMenuPage from '../pages/admin/CafeMenuPage';
+import ContactPage from '../pages/ContactPage';
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
 
         <Route
