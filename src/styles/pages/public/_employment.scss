@@ -1,0 +1,66 @@
+.employment-page {
+  &__layout {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  &__info,
+  &__form-wrapper {
+    padding: 1.5rem;
+  }
+
+  &__info {
+    h2 {
+      margin-bottom: 0.75rem;
+      color: #f8fafc;
+    }
+
+    p {
+      color: #cbd5e1;
+      line-height: 1.7;
+    }
+  }
+}
+
+.employment-form {
+  display: grid;
+  gap: 1rem;
+
+  button {
+    width: fit-content;
+    padding: 0.8rem 1.25rem;
+    border: none;
+    border-radius: 0.6rem;
+    background: linear-gradient(90deg, #f97316 0%, #ea580c 100%);
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(249, 115, 22, 0.22);
+  }
+
+  button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  &__success,
+  &__error {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  &__success {
+    color: #4ade80;
+  }
+
+  &__error {
+    color: #fda4af;
+  }
+}
+
+@media (max-width: 900px) {
+  .employment-page__layout {
+    grid-template-columns: 1fr;
+  }
+}

@@ -12,6 +12,7 @@ import AnnouncementsPage from '../pages/admin/AnnouncementsPage';
 import TournamentsPage from '../pages/admin/TournamentsPage';
 import CafeMenuPage from '../pages/admin/CafeMenuPage';
 import ContactPage from '../pages/ContactPage';
+import EmploymentPage from '../pages/EmploymentPage';
 
 export default function AppRouter() {
   return (
@@ -19,6 +20,7 @@ export default function AppRouter() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/employment" element={<EmploymentPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
 
         <Route
