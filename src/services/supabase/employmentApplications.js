@@ -1,14 +1,24 @@
-import { supabase } from './client';
+import { supabase } from './client'
 
 export async function getEmploymentApplications() {
-  const { data, error } = await supabase
-    .from('employment_applications')
-    .select('*')
-    .order('created_at', { ascending: false });
+	const { data, error } = await supabase
+		.from('employment_applications')
+		.select('*')
+		.order('created_at', { ascending: false })
 
-  if (error) {
-    throw new Error(error.message);
-  }
+	if (error) {
+		throw new Error(error.message)
+	}
 
-  return data;
+	return data
+}
+
+export async function getEmploymentApplicationById(id) {
+	const { data, error } = await supabase.from('employment_applications').select('*').eq('id', id).single()
+
+	if (error) {
+		throw new Error(error.message)
+	}
+
+	return data
 }
