@@ -9,7 +9,7 @@ export async function getPublicAnnouncements() {
     .eq('is_active', true)
     .order('display_order', { ascending: true })
     .order('created_at', { ascending: false })
-    .limit(3);
+    .limit(6);
 
   if (error) {
     throw new Error(error.message);
