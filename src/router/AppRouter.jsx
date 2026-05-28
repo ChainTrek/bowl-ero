@@ -13,6 +13,7 @@ import TournamentsPage from '../pages/admin/TournamentsPage';
 import CafeMenuPage from '../pages/admin/CafeMenuPage';
 import ContactPage from '../pages/ContactPage';
 import EmploymentPage from '../pages/EmploymentPage';
+import EmploymentApplicationsPage from '../pages/admin/EmploymentApplicationsPage';
 
 export default function AppRouter() {
   return (
@@ -39,6 +40,7 @@ export default function AppRouter() {
           <Route path="announcements" element={<AnnouncementsPage />} />
           <Route path="tournaments" element={<TournamentsPage />} />
           <Route path="cafe-menu" element={<CafeMenuPage />} />
+          <Route path="applications" element={<EmploymentApplicationsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

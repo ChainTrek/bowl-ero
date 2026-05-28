@@ -1,0 +1,73 @@
+.employment-application-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.employment-application-item {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid #d9e2ec;
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: start;
+
+    h3 {
+      margin: 0 0 0.35rem;
+    }
+
+    p {
+      margin: 0;
+      color: #52606d;
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+
+    strong {
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    p {
+      margin: 0;
+      color: #52606d;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+  }
+
+  &__section {
+    strong {
+      display: block;
+      margin-bottom: 0.35rem;
+    }
+
+    p {
+      margin: 0;
+      color: #52606d;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .employment-application-item__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .employment-application-item__grid {
+    grid-template-columns: 1fr;
+  }
+}
