@@ -5,6 +5,12 @@
     align-items: start;
     gap: 1rem;
   }
+
+  &__actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
 }
 
 .employment-application-detail {
@@ -18,8 +24,19 @@
 
     p {
       color: #52606d;
-      margin: 0;
+      margin: 0.2rem 0 0;
     }
+  }
+}
+
+.application-print-header {
+  &__eyebrow {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.35rem;
+    color: #1d4ed8;
   }
 }
 
@@ -27,6 +44,10 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
+
+  &--spaced {
+    margin-top: 1rem;
+  }
 
   strong {
     display: block;
@@ -48,6 +69,16 @@
     line-height: 1.7;
     white-space: pre-wrap;
   }
+
+  &--spaced {
+    margin-top: 1rem;
+  }
+}
+
+.employment-detail-divider {
+  margin: 1.5rem 0;
+  border: 0;
+  border-top: 1px solid #d9e2ec;
 }
 
 .employment-application-item__actions {
@@ -56,9 +87,253 @@
   flex-wrap: wrap;
 }
 
+.screen-only {
+  display: block;
+}
+
+.application-print-shell {
+  margin-top: 2rem;
+}
+
+.application-print-shell--preview {
+  display: block;
+}
+
+.print-only-shell {
+  position: absolute;
+  left: -99999px;
+  top: 0;
+  width: 8.5in;
+  overflow: hidden;
+}
+
+.application-print {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+}
+
+.application-print__header {
+  text-align: center;
+  display: grid;
+  gap: 0.15rem;
+  margin-bottom: 0.35rem;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+.application-print__header-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.application-print__header-text {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.application-print__header-text h1,
+.application-print__header-text h2,
+.application-print__header-text p {
+  margin: 0;
+}
+
+.application-print__header-text h1 {
+  font-size: 1.3rem;
+}
+
+.application-print__header-text h2 {
+  font-size: 1.1rem;
+}
+
+.application-print__header-text p {
+  font-size: 0.9rem;
+}
+
+.application-print__logo {
+  width: 84px;
+  height: auto;
+  object-fit: contain;
+}
+
+.application-print__section {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.application-print__section-title {
+  margin: 0;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid #111827;
+  font-size: 1rem;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+.application-print__section-title+* {
+  page-break-before: avoid;
+  break-before: avoid;
+}
+
+.application-print__row {
+  display: grid;
+  gap: 0.75rem;
+
+  &--2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  &--3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  &--4 {
+    grid-template-columns: 1.2fr 0.7fr 0.7fr 1fr;
+  }
+
+  &--top-line {
+    grid-template-columns: 1.9fr 0.8fr 1fr 1.45fr;
+    align-items: end;
+  }
+
+  &--address-line {
+    grid-template-columns: 2.2fr 1.15fr 0.45fr 0.65fr;
+  }
+
+  &--position-line {
+    grid-template-columns: 1.35fr 0.7fr 0.95fr 1.2fr;
+  }
+}
+
+.application-print__field,
+.application-print__choice,
+.application-print__text-block {
+  display: grid;
+  gap: 0.08rem;
+}
+
+.application-print__label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.application-print__line {
+  min-height: 1.2rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  white-space: pre-wrap;
+  line-height: 1.35;
+}
+
+.application-print__box {
+  min-height: 1.4rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  white-space: pre-wrap;
+  line-height: 1.4;
+}
+
+.application-print__text-block--tall .application-print__box {
+  min-height: 2.4rem;
+}
+
+.application-print__field--date {
+  justify-self: end;
+  width: 100%;
+  max-width: 180px;
+  text-align: right;
+
+  .application-print__label,
+  .application-print__line {
+    text-align: right;
+  }
+}
+
+.application-print__education-table {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.application-print__education-head,
+.application-print__education-row {
+  display: grid;
+  grid-template-columns: 1.1fr 2fr 1.4fr 1fr 1.4fr;
+  gap: 0.5rem;
+  align-items: start;
+}
+
+.application-print__education-head {
+  font-size: 0.8rem;
+  font-weight: 700;
+
+  span:first-child {
+    visibility: hidden;
+  }
+}
+
+.application-print__education-row {
+  padding: 0.15rem 0;
+  font-size: 0.88rem;
+}
+
+.application-print__job-block,
+.application-print__reference-block {
+  display: grid;
+  gap: 0.3rem;
+
+  h3 {
+    margin: 0;
+    font-size: 0.92rem;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+}
+
+.application-print__employer-note {
+  min-height: 2rem;
+  padding: 0.25rem 0;
+  font-style: italic;
+}
+
+.application-print__section--education {
+  page-break-before: always;
+  break-before: page;
+}
+
+.application-print__section--applicant-statement {
+  page-break-before: always;
+  break-before: page;
+}
+
+.application-print__field--date {
+  justify-self: end;
+  width: 100%;
+  max-width: 180px;
+  text-align: right;
+
+  .application-print__label,
+  .application-print__line {
+    text-align: right;
+  }
+}
+
 @media (max-width: 900px) {
   .employment-detail-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .application-print__header-brand {
+    flex-direction: column;
   }
 }
 
@@ -72,5 +347,160 @@
 @media (max-width: 640px) {
   .employment-detail-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .no-print,
+  .admin-sidebar,
+  .admin-topbar,
+  .screen-only,
+  .application-print-shell--preview {
+    display: none !important;
+  }
+
+  .print-only-shell {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: auto !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  .admin-layout {
+    display: block !important;
+  }
+
+  .admin-layout__content {
+    padding: 0 !important;
+  }
+
+  .admin-page {
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+  }
+
+  .application-print {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    gap: 0.3rem !important;
+  }
+
+  .application-print__header {
+  margin-bottom: 6rem !important;
+}
+
+  .application-print__section {
+    gap: 0.25rem !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  .application-print__section-title {
+    margin-bottom: 0.05rem !important;
+  }
+
+  .application-print__label {
+    font-size: 0.72rem !important;
+  }
+
+  .application-print__line,
+  .application-print__box {
+    line-height: 1.25 !important;
+  }
+
+  .application-print__header+.application-print__section {
+    page-break-before: avoid;
+    break-before: avoid;
+  }
+
+  .application-print__section:first-of-type,
+  .application-print__section--employment-questions {
+    gap: 0.38rem !important;
+  }
+
+  .application-print__section:first-of-type .application-print__row,
+  .application-print__section--employment-questions .application-print__row {
+    gap: 0.95rem !important;
+  }
+
+  .application-print__section:first-of-type .application-print__field,
+  .application-print__section:first-of-type .application-print__choice,
+  .application-print__section:first-of-type .application-print__text-block,
+  .application-print__section--employment-questions .application-print__field,
+  .application-print__section--employment-questions .application-print__choice,
+  .application-print__section--employment-questions .application-print__text-block {
+    gap: 0.14rem !important;
+  }
+
+  .application-print__section:first-of-type .application-print__line,
+  .application-print__section:first-of-type .application-print__box,
+  .application-print__section--employment-questions .application-print__line,
+  .application-print__section--employment-questions .application-print__box {
+    line-height: 1.4 !important;
+  }
+
+  .application-print__section:first-of-type .application-print__section-title,
+  .application-print__section--employment-questions .application-print__section-title {
+    margin-bottom: 0.12rem !important;
+  }
+
+  .application-print__job-block,
+  .application-print__reference-block {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .application-print__education-row,
+  .application-print__text-block,
+  .application-print__field,
+  .application-print__choice {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .application-print__logo {
+    width: 60px !important;
+  }
+
+  .application-print__header-text {
+    gap: 0.1rem !important;
+  }
+
+  .application-print__header-text h1 {
+    font-size: 1.15rem !important;
+  }
+
+  .application-print__header-text h2 {
+    font-size: 1rem !important;
+  }
+
+  .application-print__header-text p {
+    font-size: 0.8rem !important;
+  }
+
+  .application-print__line,
+  .application-print__box {
+    border: none !important;
+  }
+
+  a {
+    color: #000000 !important;
+    text-decoration: none !important;
+  }
+
+  @page {
+    size: auto;
+    margin: 0.45in;
   }
 }
