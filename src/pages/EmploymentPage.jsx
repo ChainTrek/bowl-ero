@@ -9,6 +9,7 @@ import SchoolFieldsBlock from '../components/employment/SchoolFieldsBlock'
 import EmployerFieldsBlock from '../components/employment/EmployerFieldsBlock'
 import ReferenceFieldsBlock from '../components/employment/ReferenceFieldsBlock'
 import EmploymentReviewSummary from '../components/employment/EmploymentReviewSummary'
+import PublicNavbar from '../components/layout/PublicNavbar'
 import { validateEmploymentForm } from '../utils/employment/validateEmploymentForm'
 import { validateEmploymentStep } from '../utils/employment/validateEmploymentStep'
 import { buildEmploymentPayload } from '../utils/employment/buildEmploymentPayload'
@@ -176,623 +177,640 @@ export default function EmploymentPage() {
 	}
 
 	return (
-		<main className='employment-page public-page'>
-			<section className='public-section'>
-				<div className='public-container'>
-					<div className='public-section-header'>
-						<span className='public-eyebrow'>Join the Team</span>
-						<h1 className='public-heading'>Employment Application</h1>
-						<p className='public-subheading'>
-							Fill out the application below if you are interested in working at Bowl-Ero.
-						</p>
-					</div>
-
-					<div className='employment-page__layout'>
-						<div className='employment-page__info public-card'>
-							<h2>Before you begin</h2>
-							<p>
-								Complete as much of the application as you can. The more accurate your
-								information is, the easier it will be for Bowl-Ero to review your application.
+		<>
+			<PublicNavbar />
+			<main className='employment-page public-page'>
+				<section className='public-section'>
+					<div className='public-container'>
+						<div className='public-section-header'>
+							<span className='public-eyebrow'>Join the Team</span>
+							<h1 className='public-heading'>Employment Application</h1>
+							<p className='public-subheading'>
+								Fill out the application below if you are interested in working at Bowl-Ero.
 							</p>
-							<p>Social Security number is not collected through the online application.</p>
-
-							<div className='employment-stepper'>
-								{EMPLOYMENT_STEPS.map((step, index) => (
-									<div
-										key={step.id}
-										className={`employment-stepper__item ${
-											index === currentStepIndex
-												? 'employment-stepper__item--active'
-												: ''
-										} ${
-											index < currentStepIndex
-												? 'employment-stepper__item--complete'
-												: ''
-										}`}
-									>
-										<span>{step.id}</span>
-										<p>{step.title}</p>
-									</div>
-								))}
-							</div>
 						</div>
 
-						<div className='employment-page__form-wrapper public-card'>
-							<form className='employment-form' onSubmit={handleSubmit}>
-								<EmploymentFormSection
-									title={currentStep.title}
-									description={currentStep.description}
-								>
-									{currentStep.key === 'personal' && (
-										<>
-											<div className='form-group'>
-												<label htmlFor='application_date'>Application Date</label>
-												<input
-													id='application_date'
-													name='application_date'
-													type='date'
-													value={formData.application_date}
-													onChange={handleChange}
-												/>
-											</div>
+						<div className='employment-page__layout'>
+							<div className='employment-page__info public-card'>
+								<h2>Before you begin</h2>
+								<p>
+									Complete as much of the application as you can. The more accurate your
+									information is, the easier it will be for Bowl-Ero to review your
+									application.
+								</p>
+								<p>Social Security number is not collected through the online application.</p>
 
-											<div className='form-row'>
+								<div className='employment-stepper'>
+									{EMPLOYMENT_STEPS.map((step, index) => (
+										<div
+											key={step.id}
+											className={`employment-stepper__item ${
+												index === currentStepIndex
+													? 'employment-stepper__item--active'
+													: ''
+											} ${
+												index < currentStepIndex
+													? 'employment-stepper__item--complete'
+													: ''
+											}`}
+										>
+											<span>{step.id}</span>
+											<p>{step.title}</p>
+										</div>
+									))}
+								</div>
+							</div>
+
+							<div className='employment-page__form-wrapper public-card'>
+								<form className='employment-form' onSubmit={handleSubmit}>
+									<EmploymentFormSection
+										title={currentStep.title}
+										description={currentStep.description}
+									>
+										{currentStep.key === 'personal' && (
+											<>
 												<div className='form-group'>
-													<label htmlFor='first_name'>First Name</label>
-													<input
-														id='first_name'
-														name='first_name'
-														type='text'
-														value={formData.first_name}
-														onChange={handleChange}
-													/>
-												</div>
-
-												<div className='form-group'>
-													<label htmlFor='last_name'>Last Name</label>
-													<input
-														id='last_name'
-														name='last_name'
-														type='text'
-														value={formData.last_name}
-														onChange={handleChange}
-													/>
-												</div>
-											</div>
-
-											<div className='form-row'>
-												<div className='form-group'>
-													<label htmlFor='email'>Email</label>
-													<input
-														id='email'
-														name='email'
-														type='email'
-														value={formData.email}
-														onChange={handleChange}
-													/>
-												</div>
-
-												<div className='form-group'>
-													<label htmlFor='phone'>Phone</label>
-													<input
-														id='phone'
-														name='phone'
-														type='tel'
-														value={formData.phone}
-														onChange={handleChange}
-													/>
-												</div>
-											</div>
-
-											<div className='form-group'>
-												<label htmlFor='address'>Address</label>
-												<input
-													id='address'
-													name='address'
-													type='text'
-													value={formData.address}
-													onChange={handleChange}
-												/>
-											</div>
-
-											<div className='form-row'>
-												<div className='form-group'>
-													<label htmlFor='city'>City</label>
-													<input
-														id='city'
-														name='city'
-														type='text'
-														value={formData.city}
-														onChange={handleChange}
-													/>
-												</div>
-
-												<div className='form-group'>
-													<label htmlFor='state'>State</label>
-													<select
-														id='state'
-														name='state'
-														value={formData.state}
-														onChange={handleChange}
-													>
-														<option value=''>Select a state</option>
-														{US_STATES.map(state => (
-															<option
-																key={state.value}
-																value={state.value}
-															>
-																{state.label}
-															</option>
-														))}
-													</select>
-												</div>
-											</div>
-
-											<div className='form-group'>
-												<label htmlFor='zip'>ZIP</label>
-												<input
-													id='zip'
-													name='zip'
-													type='text'
-													value={formData.zip}
-													onChange={handleChange}
-												/>
-											</div>
-										</>
-									)}
-
-									{currentStep.key === 'position' && (
-										<>
-											<div className='form-group'>
-												<label htmlFor='position_desired'>
-													Position Applying For
-												</label>
-												<select
-													id='position_desired'
-													name='position_desired'
-													value={formData.position_desired}
-													onChange={handleChange}
-												>
-													<option value=''>Select a position</option>
-													{POSITION_OPTIONS.map(position => (
-														<option key={position} value={position}>
-															{position}
-														</option>
-													))}
-												</select>
-											</div>
-
-											<div className='form-row'>
-												<div className='form-group'>
-													<label htmlFor='desired_salary'>Desired Salary</label>
-													<input
-														id='desired_salary'
-														name='desired_salary'
-														type='text'
-														value={formData.desired_salary}
-														onChange={handleChange}
-													/>
-												</div>
-
-												<div className='form-group'>
-													<label htmlFor='employment_type'>
-														Employment Type
+													<label htmlFor='application_date'>
+														Application Date
 													</label>
-													<select
-														id='employment_type'
-														name='employment_type'
-														value={formData.employment_type}
-														onChange={handleChange}
-													>
-														<option value=''>Select employment type</option>
-														{EMPLOYMENT_TYPE_OPTIONS.map(type => (
-															<option key={type} value={type}>
-																{type}
-															</option>
-														))}
-													</select>
-												</div>
-											</div>
-
-											<div className='form-group'>
-												<label htmlFor='available_start_date'>
-													When are you available to begin work?
-												</label>
-												<input
-													id='available_start_date'
-													name='available_start_date'
-													type='text'
-													value={formData.available_start_date}
-													onChange={handleChange}
-												/>
-											</div>
-
-											<YesNoSelectField
-												id='legally_eligible_to_work'
-												name='legally_eligible_to_work'
-												label='Are you legally eligible to work in the United States?'
-												value={formData.legally_eligible_to_work}
-												onChange={handleChange}
-											/>
-
-											<YesNoSelectField
-												id='over_16'
-												name='over_16'
-												label='Are you over the age of 16?'
-												value={formData.over_16}
-												onChange={handleChange}
-											/>
-
-											<YesNoSelectField
-												id='has_food_handlers_card'
-												name='has_food_handlers_card'
-												label='Do you have a Food Handler’s Card?'
-												value={formData.has_food_handlers_card}
-												onChange={handleChange}
-											/>
-										</>
-									)}
-
-									{currentStep.key === 'background' && (
-										<>
-											<YesNoSelectField
-												id='can_perform_essential_functions'
-												name='can_perform_essential_functions'
-												label='Can you perform the essential functions of the position?'
-												value={formData.can_perform_essential_functions}
-												onChange={handleChange}
-											/>
-
-											{formData.can_perform_essential_functions === 'no' && (
-												<div className='form-group'>
-													<label htmlFor='essential_functions_explanation'>
-														Please explain
-													</label>
-													<textarea
-														id='essential_functions_explanation'
-														name='essential_functions_explanation'
-														rows='3'
-														value={formData.essential_functions_explanation}
+													<input
+														id='application_date'
+														name='application_date'
+														type='date'
+														value={formData.application_date}
 														onChange={handleChange}
 													/>
 												</div>
-											)}
 
-											<YesNoSelectField
-												id='has_convictions'
-												name='has_convictions'
-												label='Have you been convicted of any law violations?'
-												value={formData.has_convictions}
-												onChange={handleChange}
-											/>
-
-											{formData.has_convictions === 'yes' && (
-												<div className='form-group'>
-													<label htmlFor='conviction_details'>
-														Conviction Details
-													</label>
-													<textarea
-														id='conviction_details'
-														name='conviction_details'
-														rows='3'
-														value={formData.conviction_details}
-														onChange={handleChange}
-													/>
-												</div>
-											)}
-
-											<YesNoSelectField
-												id='worked_here_before'
-												name='worked_here_before'
-												label='Have you ever worked for this company before?'
-												value={formData.worked_here_before}
-												onChange={handleChange}
-											/>
-
-											<YesNoSelectField
-												id='has_company_relatives_or_friends'
-												name='has_company_relatives_or_friends'
-												label='Do you have any relatives or friends who work for the company?'
-												value={formData.has_company_relatives_or_friends}
-												onChange={handleChange}
-											/>
-
-											{formData.has_company_relatives_or_friends === 'yes' && (
-												<div className='form-group'>
-													<label htmlFor='company_relatives_or_friends_details'>
-														Please provide details
-													</label>
-													<textarea
-														id='company_relatives_or_friends_details'
-														name='company_relatives_or_friends_details'
-														rows='3'
-														value={
-															formData.company_relatives_or_friends_details
-														}
-														onChange={handleChange}
-													/>
-												</div>
-											)}
-
-											<div className='form-group'>
-												<label htmlFor='days_hours_available'>
-													Days and Hours Available
-												</label>
-												<textarea
-													id='days_hours_available'
-													name='days_hours_available'
-													rows='4'
-													value={formData.days_hours_available}
-													onChange={handleChange}
-												/>
-											</div>
-
-											<YesNoSelectField
-												id='presently_employed'
-												name='presently_employed'
-												label='Are you presently employed?'
-												value={formData.presently_employed}
-												onChange={handleChange}
-											/>
-
-											{formData.presently_employed === 'yes' && (
-												<>
+												<div className='form-row'>
 													<div className='form-group'>
-														<label htmlFor='reason_for_leaving_current_job'>
-															Why are you considering leaving?
-														</label>
-														<textarea
-															id='reason_for_leaving_current_job'
-															name='reason_for_leaving_current_job'
-															rows='3'
-															value={
-																formData.reason_for_leaving_current_job
-															}
+														<label htmlFor='first_name'>First Name</label>
+														<input
+															id='first_name'
+															name='first_name'
+															type='text'
+															value={formData.first_name}
 															onChange={handleChange}
 														/>
 													</div>
 
-													<YesNoSelectField
-														id='may_contact_current_employer'
-														name='may_contact_current_employer'
-														label='May we contact your current employer?'
-														value={formData.may_contact_current_employer}
-														onChange={handleChange}
-													/>
-												</>
-											)}
-										</>
-									)}
+													<div className='form-group'>
+														<label htmlFor='last_name'>Last Name</label>
+														<input
+															id='last_name'
+															name='last_name'
+															type='text'
+															value={formData.last_name}
+															onChange={handleChange}
+														/>
+													</div>
+												</div>
 
-									{currentStep.key === 'education' && (
-										<>
-											<div className='form-group'>
-												<label htmlFor='organizations_memberships'>
-													Professional, trade, business, or civic organizations
-												</label>
-												<textarea
-													id='organizations_memberships'
-													name='organizations_memberships'
-													rows='4'
-													value={formData.organizations_memberships}
-													onChange={handleChange}
-												/>
-											</div>
+												<div className='form-row'>
+													<div className='form-group'>
+														<label htmlFor='email'>Email</label>
+														<input
+															id='email'
+															name='email'
+															type='email'
+															value={formData.email}
+															onChange={handleChange}
+														/>
+													</div>
 
-											<div className='form-group'>
-												<label htmlFor='special_training'>
-													Special courses, seminars, or training related to the
-													position
-												</label>
-												<textarea
-													id='special_training'
-													name='special_training'
-													rows='4'
-													value={formData.special_training}
-													onChange={handleChange}
-												/>
-											</div>
+													<div className='form-group'>
+														<label htmlFor='phone'>Phone</label>
+														<input
+															id='phone'
+															name='phone'
+															type='tel'
+															value={formData.phone}
+															onChange={handleChange}
+														/>
+													</div>
+												</div>
 
-											<SchoolFieldsBlock
-												title='High School'
-												prefix='high_school'
-												formData={formData}
-												onChange={handleChange}
-											/>
-
-											<SchoolFieldsBlock
-												title='College'
-												prefix='college'
-												formData={formData}
-												onChange={handleChange}
-											/>
-
-											<SchoolFieldsBlock
-												title='Vocational or Trade School'
-												prefix='trade_school'
-												formData={formData}
-												onChange={handleChange}
-											/>
-
-											<SchoolFieldsBlock
-												title='Graduate Work'
-												prefix='graduate_work'
-												formData={formData}
-												onChange={handleChange}
-											/>
-										</>
-									)}
-
-									{currentStep.key === 'history' && (
-										<>
-											<EmployerFieldsBlock
-												title='Most Recent Employer'
-												prefix='employer_1'
-												formData={formData}
-												onChange={handleChange}
-											/>
-
-											<EmployerFieldsBlock
-												title='Previous Employer'
-												prefix='employer_2'
-												formData={formData}
-												onChange={handleChange}
-											/>
-
-											<ReferenceFieldsBlock
-												title='Reference 1'
-												prefix='reference_1'
-												formData={formData}
-												onChange={handleChange}
-											/>
-
-											<ReferenceFieldsBlock
-												title='Reference 2'
-												prefix='reference_2'
-												formData={formData}
-												onChange={handleChange}
-											/>
-										</>
-									)}
-
-									{currentStep.key === 'signature' && (
-										<>
-											<EmploymentReviewSummary formData={formData} />
-
-											<div className='form-group'>
-												<label htmlFor='previous_experience'>
-													Previous Experience
-												</label>
-												<textarea
-													id='previous_experience'
-													name='previous_experience'
-													rows='4'
-													value={formData.previous_experience}
-													onChange={handleChange}
-												/>
-											</div>
-
-											<div className='form-group'>
-												<label htmlFor='why_work_here'>
-													Why would you like to work here?
-												</label>
-												<textarea
-													id='why_work_here'
-													name='why_work_here'
-													rows='4'
-													value={formData.why_work_here}
-													onChange={handleChange}
-												/>
-											</div>
-
-											<div className='form-group'>
-												<label htmlFor='applicant_signature'>
-													Type Your Full Name
-												</label>
-												<input
-													id='applicant_signature'
-													name='applicant_signature'
-													type='text'
-													value={formData.applicant_signature}
-													onChange={handleChange}
-												/>
-											</div>
-
-											<div className='form-group'>
-												<label htmlFor='applicant_signature_date'>
-													Signature Date
-												</label>
-												<input
-													id='applicant_signature_date'
-													name='applicant_signature_date'
-													type='date'
-													value={formData.applicant_signature_date}
-													onChange={handleChange}
-												/>
-											</div>
-
-											<div className='form-checkbox'>
-												<label htmlFor='applicant_acknowledgement'>
+												<div className='form-group'>
+													<label htmlFor='address'>Address</label>
 													<input
-														id='applicant_acknowledgement'
-														name='applicant_acknowledgement'
-														type='checkbox'
-														checked={formData.applicant_acknowledgement}
+														id='address'
+														name='address'
+														type='text'
+														value={formData.address}
 														onChange={handleChange}
 													/>
-													I confirm that the information I entered is true to the
-													best of my knowledge.
-												</label>
-											</div>
-										</>
-									)}
-								</EmploymentFormSection>
+												</div>
 
-								{statusMessage && (
-									<p
-										className={
-											isSuccess ? 'employment-form__success' : 'employment-form__error'
-										}
-									>
-										{statusMessage}
-									</p>
-								)}
+												<div className='form-row'>
+													<div className='form-group'>
+														<label htmlFor='city'>City</label>
+														<input
+															id='city'
+															name='city'
+															type='text'
+															value={formData.city}
+															onChange={handleChange}
+														/>
+													</div>
 
-								<div className='employment-form__actions'>
-									{returnToReview ? (
-										<button
-											type='button'
-											className='secondary-button'
-											onClick={() => {
-												const reviewStepIndex = EMPLOYMENT_STEPS.findIndex(
-													step => step.key === 'signature',
-												)
-												goToStep(reviewStepIndex, { returnToReview: false })
-											}}
+													<div className='form-group'>
+														<label htmlFor='state'>State</label>
+														<select
+															id='state'
+															name='state'
+															value={formData.state}
+															onChange={handleChange}
+														>
+															<option value=''>Select a state</option>
+															{US_STATES.map(state => (
+																<option
+																	key={state.value}
+																	value={state.value}
+																>
+																	{state.label}
+																</option>
+															))}
+														</select>
+													</div>
+												</div>
+
+												<div className='form-group'>
+													<label htmlFor='zip'>ZIP</label>
+													<input
+														id='zip'
+														name='zip'
+														type='text'
+														value={formData.zip}
+														onChange={handleChange}
+													/>
+												</div>
+											</>
+										)}
+
+										{currentStep.key === 'position' && (
+											<>
+												<div className='form-group'>
+													<label htmlFor='position_desired'>
+														Position Applying For
+													</label>
+													<select
+														id='position_desired'
+														name='position_desired'
+														value={formData.position_desired}
+														onChange={handleChange}
+													>
+														<option value=''>Select a position</option>
+														{POSITION_OPTIONS.map(position => (
+															<option key={position} value={position}>
+																{position}
+															</option>
+														))}
+													</select>
+												</div>
+
+												<div className='form-row'>
+													<div className='form-group'>
+														<label htmlFor='desired_salary'>
+															Desired Salary
+														</label>
+														<input
+															id='desired_salary'
+															name='desired_salary'
+															type='text'
+															value={formData.desired_salary}
+															onChange={handleChange}
+														/>
+													</div>
+
+													<div className='form-group'>
+														<label htmlFor='employment_type'>
+															Employment Type
+														</label>
+														<select
+															id='employment_type'
+															name='employment_type'
+															value={formData.employment_type}
+															onChange={handleChange}
+														>
+															<option value=''>
+																Select employment type
+															</option>
+															{EMPLOYMENT_TYPE_OPTIONS.map(type => (
+																<option key={type} value={type}>
+																	{type}
+																</option>
+															))}
+														</select>
+													</div>
+												</div>
+
+												<div className='form-group'>
+													<label htmlFor='available_start_date'>
+														When are you available to begin work?
+													</label>
+													<input
+														id='available_start_date'
+														name='available_start_date'
+														type='text'
+														value={formData.available_start_date}
+														onChange={handleChange}
+													/>
+												</div>
+
+												<YesNoSelectField
+													id='legally_eligible_to_work'
+													name='legally_eligible_to_work'
+													label='Are you legally eligible to work in the United States?'
+													value={formData.legally_eligible_to_work}
+													onChange={handleChange}
+												/>
+
+												<YesNoSelectField
+													id='over_16'
+													name='over_16'
+													label='Are you over the age of 16?'
+													value={formData.over_16}
+													onChange={handleChange}
+												/>
+
+												<YesNoSelectField
+													id='has_food_handlers_card'
+													name='has_food_handlers_card'
+													label='Do you have a Food Handler’s Card?'
+													value={formData.has_food_handlers_card}
+													onChange={handleChange}
+												/>
+											</>
+										)}
+
+										{currentStep.key === 'background' && (
+											<>
+												<YesNoSelectField
+													id='can_perform_essential_functions'
+													name='can_perform_essential_functions'
+													label='Can you perform the essential functions of the position?'
+													value={formData.can_perform_essential_functions}
+													onChange={handleChange}
+												/>
+
+												{formData.can_perform_essential_functions === 'no' && (
+													<div className='form-group'>
+														<label htmlFor='essential_functions_explanation'>
+															Please explain
+														</label>
+														<textarea
+															id='essential_functions_explanation'
+															name='essential_functions_explanation'
+															rows='3'
+															value={
+																formData.essential_functions_explanation
+															}
+															onChange={handleChange}
+														/>
+													</div>
+												)}
+
+												<YesNoSelectField
+													id='has_convictions'
+													name='has_convictions'
+													label='Have you been convicted of any law violations?'
+													value={formData.has_convictions}
+													onChange={handleChange}
+												/>
+
+												{formData.has_convictions === 'yes' && (
+													<div className='form-group'>
+														<label htmlFor='conviction_details'>
+															Conviction Details
+														</label>
+														<textarea
+															id='conviction_details'
+															name='conviction_details'
+															rows='3'
+															value={formData.conviction_details}
+															onChange={handleChange}
+														/>
+													</div>
+												)}
+
+												<YesNoSelectField
+													id='worked_here_before'
+													name='worked_here_before'
+													label='Have you ever worked for this company before?'
+													value={formData.worked_here_before}
+													onChange={handleChange}
+												/>
+
+												<YesNoSelectField
+													id='has_company_relatives_or_friends'
+													name='has_company_relatives_or_friends'
+													label='Do you have any relatives or friends who work for the company?'
+													value={formData.has_company_relatives_or_friends}
+													onChange={handleChange}
+												/>
+
+												{formData.has_company_relatives_or_friends === 'yes' && (
+													<div className='form-group'>
+														<label htmlFor='company_relatives_or_friends_details'>
+															Please provide details
+														</label>
+														<textarea
+															id='company_relatives_or_friends_details'
+															name='company_relatives_or_friends_details'
+															rows='3'
+															value={
+																formData.company_relatives_or_friends_details
+															}
+															onChange={handleChange}
+														/>
+													</div>
+												)}
+
+												<div className='form-group'>
+													<label htmlFor='days_hours_available'>
+														Days and Hours Available
+													</label>
+													<textarea
+														id='days_hours_available'
+														name='days_hours_available'
+														rows='4'
+														value={formData.days_hours_available}
+														onChange={handleChange}
+													/>
+												</div>
+
+												<YesNoSelectField
+													id='presently_employed'
+													name='presently_employed'
+													label='Are you presently employed?'
+													value={formData.presently_employed}
+													onChange={handleChange}
+												/>
+
+												{formData.presently_employed === 'yes' && (
+													<>
+														<div className='form-group'>
+															<label htmlFor='reason_for_leaving_current_job'>
+																Why are you considering leaving?
+															</label>
+															<textarea
+																id='reason_for_leaving_current_job'
+																name='reason_for_leaving_current_job'
+																rows='3'
+																value={
+																	formData.reason_for_leaving_current_job
+																}
+																onChange={handleChange}
+															/>
+														</div>
+
+														<YesNoSelectField
+															id='may_contact_current_employer'
+															name='may_contact_current_employer'
+															label='May we contact your current employer?'
+															value={formData.may_contact_current_employer}
+															onChange={handleChange}
+														/>
+													</>
+												)}
+											</>
+										)}
+
+										{currentStep.key === 'education' && (
+											<>
+												<div className='form-group'>
+													<label htmlFor='organizations_memberships'>
+														Professional, trade, business, or civic
+														organizations
+													</label>
+													<textarea
+														id='organizations_memberships'
+														name='organizations_memberships'
+														rows='4'
+														value={formData.organizations_memberships}
+														onChange={handleChange}
+													/>
+												</div>
+
+												<div className='form-group'>
+													<label htmlFor='special_training'>
+														Special courses, seminars, or training related to
+														the position
+													</label>
+													<textarea
+														id='special_training'
+														name='special_training'
+														rows='4'
+														value={formData.special_training}
+														onChange={handleChange}
+													/>
+												</div>
+
+												<SchoolFieldsBlock
+													title='High School'
+													prefix='high_school'
+													formData={formData}
+													onChange={handleChange}
+												/>
+
+												<SchoolFieldsBlock
+													title='College'
+													prefix='college'
+													formData={formData}
+													onChange={handleChange}
+												/>
+
+												<SchoolFieldsBlock
+													title='Vocational or Trade School'
+													prefix='trade_school'
+													formData={formData}
+													onChange={handleChange}
+												/>
+
+												<SchoolFieldsBlock
+													title='Graduate Work'
+													prefix='graduate_work'
+													formData={formData}
+													onChange={handleChange}
+												/>
+											</>
+										)}
+
+										{currentStep.key === 'history' && (
+											<>
+												<EmployerFieldsBlock
+													title='Most Recent Employer'
+													prefix='employer_1'
+													formData={formData}
+													onChange={handleChange}
+												/>
+
+												<EmployerFieldsBlock
+													title='Previous Employer'
+													prefix='employer_2'
+													formData={formData}
+													onChange={handleChange}
+												/>
+
+												<ReferenceFieldsBlock
+													title='Reference 1'
+													prefix='reference_1'
+													formData={formData}
+													onChange={handleChange}
+												/>
+
+												<ReferenceFieldsBlock
+													title='Reference 2'
+													prefix='reference_2'
+													formData={formData}
+													onChange={handleChange}
+												/>
+											</>
+										)}
+
+										{currentStep.key === 'signature' && (
+											<>
+												<EmploymentReviewSummary formData={formData} />
+
+												<div className='form-group'>
+													<label htmlFor='previous_experience'>
+														Previous Experience
+													</label>
+													<textarea
+														id='previous_experience'
+														name='previous_experience'
+														rows='4'
+														value={formData.previous_experience}
+														onChange={handleChange}
+													/>
+												</div>
+
+												<div className='form-group'>
+													<label htmlFor='why_work_here'>
+														Why would you like to work here?
+													</label>
+													<textarea
+														id='why_work_here'
+														name='why_work_here'
+														rows='4'
+														value={formData.why_work_here}
+														onChange={handleChange}
+													/>
+												</div>
+
+												<div className='form-group'>
+													<label htmlFor='applicant_signature'>
+														Type Your Full Name
+													</label>
+													<input
+														id='applicant_signature'
+														name='applicant_signature'
+														type='text'
+														value={formData.applicant_signature}
+														onChange={handleChange}
+													/>
+												</div>
+
+												<div className='form-group'>
+													<label htmlFor='applicant_signature_date'>
+														Signature Date
+													</label>
+													<input
+														id='applicant_signature_date'
+														name='applicant_signature_date'
+														type='date'
+														value={formData.applicant_signature_date}
+														onChange={handleChange}
+													/>
+												</div>
+
+												<div className='form-checkbox'>
+													<label htmlFor='applicant_acknowledgement'>
+														<input
+															id='applicant_acknowledgement'
+															name='applicant_acknowledgement'
+															type='checkbox'
+															checked={formData.applicant_acknowledgement}
+															onChange={handleChange}
+														/>
+														I confirm that the information I entered is true
+														to the best of my knowledge.
+													</label>
+												</div>
+											</>
+										)}
+									</EmploymentFormSection>
+
+									{statusMessage && (
+										<p
+											className={
+												isSuccess
+													? 'employment-form__success'
+													: 'employment-form__error'
+											}
 										>
-											Back to Review
-										</button>
-									) : (
-										<button
-											type='button'
-											className='secondary-button'
-											onClick={handlePreviousStep}
-											disabled={currentStepIndex === 0}
-										>
-											Previous
-										</button>
+											{statusMessage}
+										</p>
 									)}
 
-									{currentStepIndex < EMPLOYMENT_STEPS.length - 1 ? (
-										<button type='button' onClick={handleNextStep}>
-											{returnToReview ? 'Save and Return to Review' : 'Next Step'}
-										</button>
-									) : (
-										<button type='submit' disabled={submitting}>
-											{submitting ? 'Submitting...' : 'Submit Application'}
-										</button>
-									)}
-								</div>
-
-								{currentStep.key === 'signature' && (
-									<div className='employment-form__review-links'>
-										{EMPLOYMENT_STEPS.slice(0, -1).map((step, index) => (
+									<div className='employment-form__actions'>
+										{returnToReview ? (
 											<button
-												key={step.id}
 												type='button'
 												className='secondary-button'
-												onClick={() => goToStep(index, { returnToReview: true })}
+												onClick={() => {
+													const reviewStepIndex = EMPLOYMENT_STEPS.findIndex(
+														step => step.key === 'signature',
+													)
+													goToStep(reviewStepIndex, { returnToReview: false })
+												}}
 											>
-												Edit {step.title}
+												Back to Review
 											</button>
-										))}
+										) : (
+											<button
+												type='button'
+												className='secondary-button'
+												onClick={handlePreviousStep}
+												disabled={currentStepIndex === 0}
+											>
+												Previous
+											</button>
+										)}
+
+										{currentStepIndex < EMPLOYMENT_STEPS.length - 1 ? (
+											<button type='button' onClick={handleNextStep}>
+												{returnToReview ? 'Save and Return to Review' : 'Next Step'}
+											</button>
+										) : (
+											<button type='submit' disabled={submitting}>
+												{submitting ? 'Submitting...' : 'Submit Application'}
+											</button>
+										)}
 									</div>
-								)}
-							</form>
+
+									{currentStep.key === 'signature' && (
+										<div className='employment-form__review-links'>
+											{EMPLOYMENT_STEPS.slice(0, -1).map((step, index) => (
+												<button
+													key={step.id}
+													type='button'
+													className='secondary-button'
+													onClick={() =>
+														goToStep(index, { returnToReview: true })
+													}
+												>
+													Edit {step.title}
+												</button>
+											))}
+										</div>
+									)}
+								</form>
+							</div>
 						</div>
 					</div>
-				</div>
-			</section>
-		</main>
+				</section>
+			</main>
+		</>
 	)
 }
