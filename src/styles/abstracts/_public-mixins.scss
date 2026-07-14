@@ -1,0 +1,62 @@
+@mixin card-surface {
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.72) 0%, rgba(15, 23, 42, 0.56) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.2rem;
+  box-shadow:
+    0 18px 40px rgba(2, 6, 23, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+}
+
+@mixin button-blue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 44px;
+  padding: 0.8rem 1.1rem;
+  border: none;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
+  background: linear-gradient(90deg, #2563eb 0%, #0ea5e9 100%);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+
+  &:hover {
+    transform: translateY(-1px);
+    opacity: 0.96;
+  }
+}
+
+@mixin button-orange {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 44px;
+  padding: 0.8rem 1.1rem;
+  border: none;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
+  background: linear-gradient(90deg, #f97316 0%, #ea580c 100%);
+  box-shadow: 0 8px 18px rgba(249, 115, 22, 0.22);
+
+  &:hover {
+    transform: translateY(-1px);
+    opacity: 0.96;
+  }
+}

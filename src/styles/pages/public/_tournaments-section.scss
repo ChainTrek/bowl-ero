@@ -1,3 +1,5 @@
+@use '../../abstracts/public-mixins' as publicMixins;
+
 .tournaments-section {
   &__list {
     display: grid;
@@ -6,39 +8,32 @@
 }
 
 .tournament-card {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 1rem;
-  padding: 1.25rem;
+  @include publicMixins.card-surface;
+  padding: 1.35rem;
 
   &__content {
     display: grid;
-    gap: 0.6rem;
+    gap: 0.75rem;
   }
 
-  h3,
+  h2,
   p {
     margin: 0;
   }
 
-  h3 {
+  h2 {
     color: #f8fafc;
+    font-size: 1.2rem;
+    line-height: 1.25;
   }
 
   p {
     color: #cbd5e1;
-    line-height: 1.5;
+    line-height: 1.65;
   }
 
   &__link {
-    display: inline-block;
-    width: fit-content;
-    padding: 0.7rem 1rem;
-    border-radius: 0.5rem;
-    background: linear-gradient(90deg, #2563eb 0%, #0ea5e9 100%);
-    color: #ffffff;
-    text-decoration: none;
-    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+    @include publicMixins.button-blue;
   }
 }
 

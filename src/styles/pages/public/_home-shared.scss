@@ -1,3 +1,5 @@
+@use '../../abstracts/public-mixins' as publicMixins;
+
 .hero-section {
   min-height: 68vh;
   display: flex;
@@ -49,6 +51,7 @@
   }
 
   .home-preview-card {
+    @include publicMixins.card-surface;
     display: grid;
     gap: 0.9rem;
     padding: 1.5rem;
@@ -57,6 +60,7 @@
       margin: 0;
       color: #f8fafc;
       font-size: 1.2rem;
+      line-height: 1.25;
     }
 
     p {
@@ -77,34 +81,18 @@
   }
 
   .primary-link-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: fit-content;
-    padding: 0.8rem 1.1rem;
-    border-radius: 0.75rem;
-    text-decoration: none;
-    font-weight: 700;
-    color: #ffffff;
-    background: linear-gradient(90deg, #2563eb 0%, #0ea5e9 100%);
-    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2);
-    transition: transform 0.2s ease, opacity 0.2s ease;
-
-    &:hover {
-      transform: translateY(-1px);
-      opacity: 0.95;
-    }
+    @include publicMixins.button-blue;
   }
 }
 
 .public-destination-page {
   .public-destination-hero {
     padding-top: 2rem;
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.75rem;
   }
 
   .public-section:last-of-type {
-    padding-bottom: 2.5rem;
+    padding-bottom: 2.75rem;
   }
 }
 
