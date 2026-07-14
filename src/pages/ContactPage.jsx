@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createPublicMessage } from '../services/supabase/publicContact'
 import PublicNavbar from '../components/layout/PublicNavbar'
+import PublicFooter from '../components/public/PublicFooter'
 
 const initialForm = {
 	name: '',
@@ -77,19 +78,24 @@ export default function ContactPage() {
 
 	return (
 		<>
-      <PublicNavbar />
-			<main className='contact-page public-page'>
-				<section className='public-section'>
+			<PublicNavbar />
+
+			<main className='contact-page public-page public-destination-page'>
+				<section className='public-section public-section--tight public-destination-hero'>
 					<div className='public-container'>
 						<div className='public-section-header'>
 							<span className='public-eyebrow'>Get In Touch</span>
 							<h1 className='public-heading'>Contact Us</h1>
 							<p className='public-subheading'>
 								Send a message to Bowl-Ero and a member of the team will review it and get back
-								to you as soon as they can.
+								to you as soon as possible.
 							</p>
 						</div>
+					</div>
+				</section>
 
+				<section className='public-section'>
+					<div className='public-container'>
 						<div className='contact-page__layout'>
 							<div className='contact-page__info public-card'>
 								<h2>We’d love to hear from you</h2>
@@ -112,26 +118,28 @@ export default function ContactPage() {
 										/>
 									</div>
 
-									<div className='form-group'>
-										<label htmlFor='email'>Email</label>
-										<input
-											id='email'
-											name='email'
-											type='email'
-											value={formData.email}
-											onChange={handleChange}
-										/>
-									</div>
+									<div className='form-row'>
+										<div className='form-group'>
+											<label htmlFor='email'>Email</label>
+											<input
+												id='email'
+												name='email'
+												type='email'
+												value={formData.email}
+												onChange={handleChange}
+											/>
+										</div>
 
-									<div className='form-group'>
-										<label htmlFor='phone'>Phone</label>
-										<input
-											id='phone'
-											name='phone'
-											type='tel'
-											value={formData.phone}
-											onChange={handleChange}
-										/>
+										<div className='form-group'>
+											<label htmlFor='phone'>Phone</label>
+											<input
+												id='phone'
+												name='phone'
+												type='tel'
+												value={formData.phone}
+												onChange={handleChange}
+											/>
+										</div>
 									</div>
 
 									<div className='form-group'>
@@ -157,11 +165,7 @@ export default function ContactPage() {
 									</div>
 
 									{statusMessage && (
-										<p
-											className={
-												isSuccess ? 'contact-form__success' : 'contact-form__error'
-											}
-										>
+										<p className={isSuccess ? 'contact-form__success' : 'contact-form__error'}>
 											{statusMessage}
 										</p>
 									)}
@@ -174,6 +178,8 @@ export default function ContactPage() {
 						</div>
 					</div>
 				</section>
+
+				<PublicFooter />
 			</main>
 		</>
 	)

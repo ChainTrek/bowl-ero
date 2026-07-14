@@ -10,6 +10,7 @@ import EmployerFieldsBlock from '../components/employment/EmployerFieldsBlock'
 import ReferenceFieldsBlock from '../components/employment/ReferenceFieldsBlock'
 import EmploymentReviewSummary from '../components/employment/EmploymentReviewSummary'
 import PublicNavbar from '../components/layout/PublicNavbar'
+import PublicFooter from '../components/public/PublicFooter'
 import { validateEmploymentForm } from '../utils/employment/validateEmploymentForm'
 import { validateEmploymentStep } from '../utils/employment/validateEmploymentStep'
 import { buildEmploymentPayload } from '../utils/employment/buildEmploymentPayload'
@@ -179,8 +180,8 @@ export default function EmploymentPage() {
 	return (
 		<>
 			<PublicNavbar />
-			<main className='employment-page public-page'>
-				<section className='public-section'>
+			<main className='employment-page public-page public-destination-page'>
+				<section className='public-section public-section--tight public-destination-hero'>
 					<div className='public-container'>
 						<div className='public-section-header'>
 							<span className='public-eyebrow'>Join the Team</span>
@@ -189,7 +190,11 @@ export default function EmploymentPage() {
 								Fill out the application below if you are interested in working at Bowl-Ero.
 							</p>
 						</div>
+					</div>
+				</section>
 
+				<section className='public-section'>
+					<div className='public-container'>
 						<div className='employment-page__layout'>
 							<div className='employment-page__info public-card'>
 								<h2>Before you begin</h2>
@@ -810,6 +815,7 @@ export default function EmploymentPage() {
 						</div>
 					</div>
 				</section>
+				<PublicFooter />
 			</main>
 		</>
 	)

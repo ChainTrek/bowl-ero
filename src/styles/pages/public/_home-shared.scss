@@ -99,7 +99,12 @@
 
 .public-destination-page {
   .public-destination-hero {
+    padding-top: 2rem;
     padding-bottom: 0.5rem;
+  }
+
+  .public-section:last-of-type {
+    padding-bottom: 2.5rem;
   }
 }
 

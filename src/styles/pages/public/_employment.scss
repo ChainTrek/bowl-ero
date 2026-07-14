@@ -1,3 +1,14 @@
+.employment-page.public-destination-page {
+  .public-destination-hero {
+    padding-top: 2rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .public-section:last-of-type {
+    padding-bottom: 3rem;
+  }
+}
+
 .employment-page {
   &__layout {
     display: grid;
