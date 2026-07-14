@@ -87,8 +87,8 @@ export default function ContactPage() {
 							<span className='public-eyebrow'>Get In Touch</span>
 							<h1 className='public-heading'>Contact Us</h1>
 							<p className='public-subheading'>
-								Send a message to Bowl-Ero and a member of the team will review it and get back
-								to you as soon as possible.
+								Send a message to Bowl-Ero and a member of the team will review it and
+								get back to you as soon as possible.
 							</p>
 						</div>
 					</div>
@@ -98,11 +98,32 @@ export default function ContactPage() {
 					<div className='public-container'>
 						<div className='contact-page__layout'>
 							<div className='contact-page__info public-card'>
-								<h2>We’d love to hear from you</h2>
-								<p>
-									Use this form to ask a question, send feedback, or reach out about leagues,
-									tournaments, events, or general information.
-								</p>
+								<div className='contact-page__info-header'>
+									<span className='public-eyebrow'>Reach Out</span>
+									<h2>We’d love to hear from you</h2>
+									<p>
+										Use this form to ask a question, send feedback, or reach out about
+										leagues, tournaments, events, or general information.
+									</p>
+								</div>
+
+								<div className='contact-page__details'>
+									<div className='contact-page__detail-item'>
+										<h3>Visit</h3>
+										<p>670 1st St.</p>
+										<p>Idaho Falls, ID 83401</p>
+									</div>
+
+									<div className='contact-page__detail-item'>
+										<h3>Call</h3>
+										<p><a href='tel:2085249900'>(208) 524-9900</a></p>
+									</div>
+
+									<div className='contact-page__detail-item'>
+										<h3>Best for</h3>
+										<p>Questions about leagues, events, tournaments, and general info.</p>
+									</div>
+								</div>
 							</div>
 
 							<div className='contact-page__form-wrapper public-card'>
@@ -158,7 +179,7 @@ export default function ContactPage() {
 										<textarea
 											id='message'
 											name='message'
-											rows='6'
+											rows='7'
 											value={formData.message}
 											onChange={handleChange}
 										/>

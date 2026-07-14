@@ -1,3 +1,5 @@
+@use '../../abstracts/public-mixins' as publicMixins;
+
 .contact-page.public-destination-page {
   .public-destination-hero {
     padding-top: 2rem;
@@ -23,16 +25,62 @@
   }
 
   &__info {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  &__info-header {
+    display: grid;
+    gap: 0.6rem;
+
+    .public-eyebrow {
+      margin-bottom: 0;
+    }
+
     h2 {
-      margin-bottom: 0.75rem;
+      margin: 0;
       color: #f8fafc;
+      font-size: 1.5rem;
+      line-height: 1.15;
     }
 
     p {
       margin: 0;
       color: #cbd5e1;
-      line-height: 1.7;
+      line-height: 1.75;
     }
+  }
+
+  &__details {
+    display: grid;
+    gap: 1rem;
+  }
+
+  &__detail-item {
+    padding: 1rem 1.05rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+
+    h3 {
+      margin: 0 0 0.45rem;
+      color: #f8fafc;
+      font-size: 1rem;
+    }
+
+    p {
+      margin: 0;
+      color: #cbd5e1;
+      line-height: 1.65;
+    }
+
+    p + p {
+      margin-top: 0.15rem;
+    }
+  }
+
+  &__form-wrapper {
+    min-height: 100%;
   }
 }
 
@@ -40,15 +88,57 @@
   display: grid;
   gap: 1rem;
 
+  .form-group {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  label {
+    color: #e2e8f0;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: rgba(15, 23, 42, 0.55);
+    color: #f8fafc;
+    padding: 0.9rem 1rem;
+    outline: none;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      background 0.2s ease;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #94a3b8;
+  }
+
+  input:focus,
+  textarea:focus {
+    border-color: rgba(56, 189, 248, 0.45);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+    background: rgba(15, 23, 42, 0.72);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 180px;
+  }
+
   button {
-    width: fit-content;
-    padding: 0.8rem 1.25rem;
-    border: none;
-    border-radius: 0.6rem;
-    background: linear-gradient(90deg, #2563eb 0%, #0ea5e9 100%);
-    color: #ffffff;
-    cursor: pointer;
-    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+    @include publicMixins.button-blue;
   }
 
   button:disabled {
@@ -60,6 +150,7 @@
   &__error {
     margin: 0;
     font-weight: 600;
+    line-height: 1.6;
   }
 
   &__success {
@@ -73,6 +164,12 @@
 
 @media (max-width: 900px) {
   .contact-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .contact-form .form-row {
     grid-template-columns: 1fr;
   }
 }
