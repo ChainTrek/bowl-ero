@@ -206,23 +206,58 @@ export default function EmploymentPage() {
 								<p>Social Security number is not collected through the online application.</p>
 
 								<div className='employment-stepper'>
-									{EMPLOYMENT_STEPS.map((step, index) => (
-										<div
-											key={step.id}
-											className={`employment-stepper__item ${
-												index === currentStepIndex
-													? 'employment-stepper__item--active'
-													: ''
-											} ${
-												index < currentStepIndex
-													? 'employment-stepper__item--complete'
-													: ''
-											}`}
-										>
-											<span>{step.id}</span>
-											<p>{step.title}</p>
-										</div>
-									))}
+									{EMPLOYMENT_STEPS.map((step, index) => {
+										const isActive = index === currentStepIndex
+										const isComplete = index < currentStepIndex
+										const isReviewStep = step.key === 'signature'
+										const shouldReturnToReview =
+											currentStep.key === 'signature' && !isReviewStep
+
+										return (
+											<button
+												key={step.id}
+												type='button'
+												className={`employment-stepper__item ${
+													isActive ? 'employment-stepper__item--active' : ''
+												} ${isComplete ? 'employment-stepper__item--complete' : ''}`}
+												onClick={() =>
+													goToStep(index, {
+														returnToReview: shouldReturnToReview,
+													})
+												}
+											>
+												<span className='employment-stepper__badge'>
+													{isComplete ? '✓' : step.id}
+												</span>
+
+												<div className='employment-stepper__content'>
+													<p className='employment-stepper__title'>
+														{step.title}
+													</p>
+
+													{isActive && (
+														<p className='employment-stepper__status'>
+															Current section
+														</p>
+													)}
+
+													{isComplete && !isActive && (
+														<p className='employment-stepper__status employment-stepper__status--complete'>
+															Completed
+														</p>
+													)}
+
+													{shouldReturnToReview &&
+														!isActive &&
+														!isReviewStep && (
+															<p className='employment-stepper__status employment-stepper__status--return'>
+																Edit and return to review
+															</p>
+														)}
+												</div>
+											</button>
+										)
+									})}
 								</div>
 							</div>
 
