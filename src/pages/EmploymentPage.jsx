@@ -234,10 +234,14 @@ export default function EmploymentPage() {
 												</span>
 
 												<div className='employment-stepper__content'>
-													<p className='employment-stepper__title'>{step.title}</p>
+													<p className='employment-stepper__title'>
+														{step.title}
+													</p>
 
 													{isActive && (
-														<p className='employment-stepper__status'>Current section</p>
+														<p className='employment-stepper__status'>
+															Current section
+														</p>
 													)}
 
 													{isComplete && !isActive && (
@@ -246,11 +250,13 @@ export default function EmploymentPage() {
 														</p>
 													)}
 
-													{shouldReturnToReview && !isActive && !isReviewStep && (
-														<p className='employment-stepper__status employment-stepper__status--return'>
-															Edit and return to review
-														</p>
-													)}
+													{shouldReturnToReview &&
+														!isActive &&
+														!isReviewStep && (
+															<p className='employment-stepper__status employment-stepper__status--return'>
+																Edit and return to review
+															</p>
+														)}
 												</div>
 											</button>
 										)
@@ -260,7 +266,7 @@ export default function EmploymentPage() {
 						</div>
 
 						<div className='employment-page__form-wrapper public-card'>
-							<form className='employment-form' onSubmit={handleSubmit}>
+							<form className='employment-form public-form' onSubmit={handleSubmit}>
 								<EmploymentFormSection
 									title={currentStep.title}
 									description={currentStep.description}
@@ -359,7 +365,10 @@ export default function EmploymentPage() {
 													>
 														<option value=''>Select a state</option>
 														{US_STATES.map(state => (
-															<option key={state.value} value={state.value}>
+															<option
+																key={state.value}
+																value={state.value}
+															>
 																{state.label}
 															</option>
 														))}
@@ -383,7 +392,9 @@ export default function EmploymentPage() {
 									{currentStep.key === 'position' && (
 										<>
 											<div className='form-group'>
-												<label htmlFor='position_desired'>Position Applying For</label>
+												<label htmlFor='position_desired'>
+													Position Applying For
+												</label>
 												<select
 													id='position_desired'
 													name='position_desired'
@@ -412,7 +423,9 @@ export default function EmploymentPage() {
 												</div>
 
 												<div className='form-group'>
-													<label htmlFor='employment_type'>Employment Type</label>
+													<label htmlFor='employment_type'>
+														Employment Type
+													</label>
 													<select
 														id='employment_type'
 														name='employment_type'
@@ -503,7 +516,9 @@ export default function EmploymentPage() {
 
 											{formData.has_convictions === 'yes' && (
 												<div className='form-group'>
-													<label htmlFor='conviction_details'>Conviction Details</label>
+													<label htmlFor='conviction_details'>
+														Conviction Details
+													</label>
 													<textarea
 														id='conviction_details'
 														name='conviction_details'
@@ -539,14 +554,18 @@ export default function EmploymentPage() {
 														id='company_relatives_or_friends_details'
 														name='company_relatives_or_friends_details'
 														rows='3'
-														value={formData.company_relatives_or_friends_details}
+														value={
+															formData.company_relatives_or_friends_details
+														}
 														onChange={handleChange}
 													/>
 												</div>
 											)}
 
 											<div className='form-group'>
-												<label htmlFor='days_hours_available'>Days and Hours Available</label>
+												<label htmlFor='days_hours_available'>
+													Days and Hours Available
+												</label>
 												<textarea
 													id='days_hours_available'
 													name='days_hours_available'
@@ -574,7 +593,9 @@ export default function EmploymentPage() {
 															id='reason_for_leaving_current_job'
 															name='reason_for_leaving_current_job'
 															rows='3'
-															value={formData.reason_for_leaving_current_job}
+															value={
+																formData.reason_for_leaving_current_job
+															}
 															onChange={handleChange}
 														/>
 													</div>
@@ -608,7 +629,8 @@ export default function EmploymentPage() {
 
 											<div className='form-group'>
 												<label htmlFor='special_training'>
-													Special courses, seminars, or training related to the position
+													Special courses, seminars, or training related to the
+													position
 												</label>
 												<textarea
 													id='special_training'
@@ -686,7 +708,9 @@ export default function EmploymentPage() {
 											<EmploymentReviewSummary formData={formData} />
 
 											<div className='form-group'>
-												<label htmlFor='previous_experience'>Previous Experience</label>
+												<label htmlFor='previous_experience'>
+													Previous Experience
+												</label>
 												<textarea
 													id='previous_experience'
 													name='previous_experience'
@@ -697,7 +721,9 @@ export default function EmploymentPage() {
 											</div>
 
 											<div className='form-group'>
-												<label htmlFor='why_work_here'>Why would you like to work here?</label>
+												<label htmlFor='why_work_here'>
+													Why would you like to work here?
+												</label>
 												<textarea
 													id='why_work_here'
 													name='why_work_here'
@@ -708,7 +734,9 @@ export default function EmploymentPage() {
 											</div>
 
 											<div className='form-group'>
-												<label htmlFor='applicant_signature'>Type Your Full Name</label>
+												<label htmlFor='applicant_signature'>
+													Type Your Full Name
+												</label>
 												<input
 													id='applicant_signature'
 													name='applicant_signature'
@@ -719,7 +747,9 @@ export default function EmploymentPage() {
 											</div>
 
 											<div className='form-group'>
-												<label htmlFor='applicant_signature_date'>Signature Date</label>
+												<label htmlFor='applicant_signature_date'>
+													Signature Date
+												</label>
 												<input
 													id='applicant_signature_date'
 													name='applicant_signature_date'
@@ -738,8 +768,8 @@ export default function EmploymentPage() {
 														checked={formData.applicant_acknowledgement}
 														onChange={handleChange}
 													/>
-													I confirm that the information I entered is true to the best of my
-													knowledge.
+													I confirm that the information I entered is true to the
+													best of my knowledge.
 												</label>
 											</div>
 										</>
@@ -747,11 +777,7 @@ export default function EmploymentPage() {
 								</EmploymentFormSection>
 
 								{statusMessage && (
-									<p
-										className={
-											isSuccess ? 'employment-form__success' : 'employment-form__error'
-										}
-									>
+									<p className={isSuccess ? 'public-form__success' : 'public-form__error'}>
 										{statusMessage}
 									</p>
 								)}

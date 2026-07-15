@@ -205,52 +205,6 @@
   line-height: 1.2;
 }
 
-.employment-form .form-group {
-  display: grid;
-  gap: 0.45rem;
-}
-
-.employment-form .form-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
-
-.employment-form label {
-  color: #e2e8f0;
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-
-.employment-form input,
-.employment-form select,
-.employment-form textarea {
-  width: 100%;
-  border-radius: 0.9rem;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  background: rgba(15, 23, 42, 0.55);
-  color: #f8fafc;
-  padding: 0.9rem 1rem;
-  outline: none;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
-}
-
-.employment-form input::placeholder,
-.employment-form textarea::placeholder {
-  color: #94a3b8;
-}
-
-.employment-form input:focus,
-.employment-form select:focus,
-.employment-form textarea:focus {
-  border-color: rgba(56, 189, 248, 0.45);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
-  background: rgba(15, 23, 42, 0.72);
-}
-
 .employment-form textarea {
   resize: vertical;
   min-height: 140px;
@@ -261,20 +215,6 @@
   color: #94a3b8;
   font-size: 0.9rem;
   line-height: 1.5;
-}
-
-.employment-form__status {
-  margin: 0;
-  font-weight: 600;
-  line-height: 1.6;
-}
-
-.employment-form__status--success {
-  color: #4ade80;
-}
-
-.employment-form__status--error {
-  color: #fda4af;
 }
 
 .employment-form__actions {
@@ -362,9 +302,7 @@
 }
 
 @media (max-width: 768px) {
-
-  .employment-form__grid,
-  .employment-form .form-row {
+  .employment-form__grid {
     grid-template-columns: 1fr;
   }
 }

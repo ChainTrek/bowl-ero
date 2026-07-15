@@ -111,7 +111,7 @@ export default function ContactPage() {
 						</div>
 
 						<div className='contact-page__form-wrapper public-card'>
-							<form className='contact-form' onSubmit={handleSubmit}>
+							<form className='contact-form public-form' onSubmit={handleSubmit}>
 								<div className='form-group'>
 									<label htmlFor='name'>Name</label>
 									<input
@@ -170,7 +170,7 @@ export default function ContactPage() {
 								</div>
 
 								{statusMessage && (
-									<p className={isSuccess ? 'contact-form__success' : 'contact-form__error'}>
+									<p className={isSuccess ? 'public-form__success' : 'public-form__error'}>
 										{statusMessage}
 									</p>
 								)}
