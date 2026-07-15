@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import PublicPageShell from '../components/layout/PublicPageShell'
+import PublicInfoPanel from '../components/public/PublicInfoPanel'
 import { createEmploymentApplication } from '../services/supabase/publicEmployment'
 import { US_STATES } from '../constants/usStates'
 import { POSITION_OPTIONS, EMPLOYMENT_TYPE_OPTIONS } from '../constants/employmentOptions'
@@ -86,6 +87,20 @@ const initialForm = {
 	applicant_signature_date: '',
 	applicant_acknowledgement: false,
 }
+
+const employmentInfoItems = [
+	{
+		title: 'Before you begin',
+		lines: [
+			'Complete as much of the application as you can.',
+			'The more accurate your information is, the easier it will be for Bowl-Ero to review your application.',
+		],
+	},
+	{
+		title: 'Privacy',
+		lines: ['Social Security number is not collected through the online application.'],
+	},
+]
 
 export default function EmploymentPage() {
 	const [formData, setFormData] = useState(initialForm)
@@ -187,65 +202,61 @@ export default function EmploymentPage() {
 				<div className='public-container'>
 					<div className='employment-page__layout'>
 						<div className='employment-page__info public-card'>
-							<div className='employment-page__info-header'>
-								<span className='public-eyebrow'>Before You Begin</span>
-								<h2>Before you begin</h2>
-								<p>
-									Complete as much of the application as you can. The more accurate your
-									information is, the easier it will be for Bowl-Ero to review your
-									application.
-								</p>
-								<p>Social Security number is not collected through the online application.</p>
-							</div>
+							<PublicInfoPanel
+								eyebrow='Before You Begin'
+								title='Application guide'
+								description='Work through each section, review your answers, and submit when everything looks right.'
+								items={employmentInfoItems}
+							>
+								<div className='employment-stepper'>
+									{EMPLOYMENT_STEPS.map((step, index) => {
+										const isActive = index === currentStepIndex
+										const isComplete = index < currentStepIndex
+										const isReviewStep = step.key === 'signature'
+										const shouldReturnToReview =
+											currentStep.key === 'signature' && !isReviewStep
 
-							<div className='employment-stepper'>
-								{EMPLOYMENT_STEPS.map((step, index) => {
-									const isActive = index === currentStepIndex
-									const isComplete = index < currentStepIndex
-									const isReviewStep = step.key === 'signature'
-									const shouldReturnToReview =
-										currentStep.key === 'signature' && !isReviewStep
+										return (
+											<button
+												key={step.id}
+												type='button'
+												className={`employment-stepper__item ${
+													isActive ? 'employment-stepper__item--active' : ''
+												} ${isComplete ? 'employment-stepper__item--complete' : ''}`}
+												onClick={() =>
+													goToStep(index, {
+														returnToReview: shouldReturnToReview,
+													})
+												}
+											>
+												<span className='employment-stepper__badge'>
+													{isComplete ? '✓' : step.id}
+												</span>
 
-									return (
-										<button
-											key={step.id}
-											type='button'
-											className={`employment-stepper__item ${
-												isActive ? 'employment-stepper__item--active' : ''
-											} ${isComplete ? 'employment-stepper__item--complete' : ''}`}
-											onClick={() =>
-												goToStep(index, {
-													returnToReview: shouldReturnToReview,
-												})
-											}
-										>
-											<span className='employment-stepper__badge'>
-												{isComplete ? '✓' : step.id}
-											</span>
+												<div className='employment-stepper__content'>
+													<p className='employment-stepper__title'>{step.title}</p>
 
-											<div className='employment-stepper__content'>
-												<p className='employment-stepper__title'>{step.title}</p>
+													{isActive && (
+														<p className='employment-stepper__status'>Current section</p>
+													)}
 
-												{isActive && (
-													<p className='employment-stepper__status'>Current section</p>
-												)}
+													{isComplete && !isActive && (
+														<p className='employment-stepper__status employment-stepper__status--complete'>
+															Completed
+														</p>
+													)}
 
-												{isComplete && !isActive && (
-													<p className='employment-stepper__status employment-stepper__status--complete'>
-														Completed
-													</p>
-												)}
-
-												{shouldReturnToReview && !isActive && !isReviewStep && (
-													<p className='employment-stepper__status employment-stepper__status--return'>
-														Edit and return to review
-													</p>
-												)}
-											</div>
-										</button>
-									)
-								})}
-							</div>
+													{shouldReturnToReview && !isActive && !isReviewStep && (
+														<p className='employment-stepper__status employment-stepper__status--return'>
+															Edit and return to review
+														</p>
+													)}
+												</div>
+											</button>
+										)
+									})}
+								</div>
+							</PublicInfoPanel>
 						</div>
 
 						<div className='employment-page__form-wrapper public-card'>

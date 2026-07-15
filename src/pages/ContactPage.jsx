@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import PublicPageShell from '../components/layout/PublicPageShell'
+import PublicInfoPanel from '../components/public/PublicInfoPanel'
 import { createPublicMessage } from '../services/supabase/publicContact'
 
 const initialForm = {
@@ -9,6 +10,21 @@ const initialForm = {
 	subject: '',
 	message: '',
 }
+
+const contactInfoItems = [
+	{
+		title: 'Visit',
+		lines: ['2530 Channing Way', 'Idaho Falls, ID'],
+	},
+	{
+		title: 'Call',
+		lines: ['(208) 529-3000'],
+	},
+	{
+		title: 'Best for',
+		lines: ['Questions about leagues, events, tournaments, and general info.'],
+	},
+]
 
 export default function ContactPage() {
 	const [formData, setFormData] = useState(initialForm)
@@ -86,32 +102,12 @@ export default function ContactPage() {
 				<div className='public-container'>
 					<div className='contact-page__layout'>
 						<div className='contact-page__info public-card'>
-							<div className='contact-page__info-header'>
-								<span className='public-eyebrow'>Reach Out</span>
-								<h2>We’d love to hear from you</h2>
-								<p>
-									Use this form to ask a question, send feedback, or reach out about
-									leagues, tournaments, events, or general information.
-								</p>
-							</div>
-
-							<div className='contact-page__details'>
-								<div className='contact-page__detail-item'>
-									<h3>Visit</h3>
-									<p>2530 Channing Way</p>
-									<p>Idaho Falls, ID</p>
-								</div>
-
-								<div className='contact-page__detail-item'>
-									<h3>Call</h3>
-									<p>(208) 529-3000</p>
-								</div>
-
-								<div className='contact-page__detail-item'>
-									<h3>Best for</h3>
-									<p>Questions about leagues, events, tournaments, and general info.</p>
-								</div>
-							</div>
+							<PublicInfoPanel
+								eyebrow='Reach Out'
+								title='We’d love to hear from you'
+								description='Use this form to ask a question, send feedback, or reach out about leagues, tournaments, events, or general information.'
+								items={contactInfoItems}
+							/>
 						</div>
 
 						<div className='contact-page__form-wrapper public-card'>
