@@ -1,7 +1,6 @@
 import { useState } from 'react'
+import PublicPageShell from '../components/layout/PublicPageShell'
 import { createPublicMessage } from '../services/supabase/publicContact'
-import PublicNavbar from '../components/layout/PublicNavbar'
-import PublicFooter from '../components/public/PublicFooter'
 
 const initialForm = {
 	name: '',
@@ -77,131 +76,117 @@ export default function ContactPage() {
 	}
 
 	return (
-		<>
-			<PublicNavbar />
+		<PublicPageShell
+			eyebrow='Get In Touch'
+			title='Contact Us'
+			description='Send a message to Bowl-Ero and a member of the team will review it and get back to you as soon as possible.'
+			mainClassName='contact-page'
+		>
+			<section className='public-section'>
+				<div className='public-container'>
+					<div className='contact-page__layout'>
+						<div className='contact-page__info public-card'>
+							<div className='contact-page__info-header'>
+								<span className='public-eyebrow'>Reach Out</span>
+								<h2>We’d love to hear from you</h2>
+								<p>
+									Use this form to ask a question, send feedback, or reach out about
+									leagues, tournaments, events, or general information.
+								</p>
+							</div>
 
-			<main className='contact-page public-page public-destination-page'>
-				<section className='public-section public-section--tight public-destination-hero'>
-					<div className='public-container'>
-						<div className='public-section-header'>
-							<span className='public-eyebrow'>Get In Touch</span>
-							<h1 className='public-heading'>Contact Us</h1>
-							<p className='public-subheading'>
-								Send a message to Bowl-Ero and a member of the team will review it and
-								get back to you as soon as possible.
-							</p>
+							<div className='contact-page__details'>
+								<div className='contact-page__detail-item'>
+									<h3>Visit</h3>
+									<p>2530 Channing Way</p>
+									<p>Idaho Falls, ID</p>
+								</div>
+
+								<div className='contact-page__detail-item'>
+									<h3>Call</h3>
+									<p>(208) 529-3000</p>
+								</div>
+
+								<div className='contact-page__detail-item'>
+									<h3>Best for</h3>
+									<p>Questions about leagues, events, tournaments, and general info.</p>
+								</div>
+							</div>
 						</div>
-					</div>
-				</section>
 
-				<section className='public-section'>
-					<div className='public-container'>
-						<div className='contact-page__layout'>
-							<div className='contact-page__info public-card'>
-								<div className='contact-page__info-header'>
-									<span className='public-eyebrow'>Reach Out</span>
-									<h2>We’d love to hear from you</h2>
-									<p>
-										Use this form to ask a question, send feedback, or reach out about
-										leagues, tournaments, events, or general information.
+						<div className='contact-page__form-wrapper public-card'>
+							<form className='contact-form' onSubmit={handleSubmit}>
+								<div className='form-group'>
+									<label htmlFor='name'>Name</label>
+									<input
+										id='name'
+										name='name'
+										type='text'
+										value={formData.name}
+										onChange={handleChange}
+									/>
+								</div>
+
+								<div className='form-row'>
+									<div className='form-group'>
+										<label htmlFor='email'>Email</label>
+										<input
+											id='email'
+											name='email'
+											type='email'
+											value={formData.email}
+											onChange={handleChange}
+										/>
+									</div>
+
+									<div className='form-group'>
+										<label htmlFor='phone'>Phone</label>
+										<input
+											id='phone'
+											name='phone'
+											type='tel'
+											value={formData.phone}
+											onChange={handleChange}
+										/>
+									</div>
+								</div>
+
+								<div className='form-group'>
+									<label htmlFor='subject'>Subject</label>
+									<input
+										id='subject'
+										name='subject'
+										type='text'
+										value={formData.subject}
+										onChange={handleChange}
+									/>
+								</div>
+
+								<div className='form-group'>
+									<label htmlFor='message'>Message</label>
+									<textarea
+										id='message'
+										name='message'
+										rows='7'
+										value={formData.message}
+										onChange={handleChange}
+									/>
+								</div>
+
+								{statusMessage && (
+									<p className={isSuccess ? 'contact-form__success' : 'contact-form__error'}>
+										{statusMessage}
 									</p>
-								</div>
+								)}
 
-								<div className='contact-page__details'>
-									<div className='contact-page__detail-item'>
-										<h3>Visit</h3>
-										<p>670 1st St.</p>
-										<p>Idaho Falls, ID 83401</p>
-									</div>
-
-									<div className='contact-page__detail-item'>
-										<h3>Call</h3>
-										<p><a href='tel:2085249900'>(208) 524-9900</a></p>
-									</div>
-
-									<div className='contact-page__detail-item'>
-										<h3>Best for</h3>
-										<p>Questions about leagues, events, tournaments, and general info.</p>
-									</div>
-								</div>
-							</div>
-
-							<div className='contact-page__form-wrapper public-card'>
-								<form className='contact-form' onSubmit={handleSubmit}>
-									<div className='form-group'>
-										<label htmlFor='name'>Name</label>
-										<input
-											id='name'
-											name='name'
-											type='text'
-											value={formData.name}
-											onChange={handleChange}
-										/>
-									</div>
-
-									<div className='form-row'>
-										<div className='form-group'>
-											<label htmlFor='email'>Email</label>
-											<input
-												id='email'
-												name='email'
-												type='email'
-												value={formData.email}
-												onChange={handleChange}
-											/>
-										</div>
-
-										<div className='form-group'>
-											<label htmlFor='phone'>Phone</label>
-											<input
-												id='phone'
-												name='phone'
-												type='tel'
-												value={formData.phone}
-												onChange={handleChange}
-											/>
-										</div>
-									</div>
-
-									<div className='form-group'>
-										<label htmlFor='subject'>Subject</label>
-										<input
-											id='subject'
-											name='subject'
-											type='text'
-											value={formData.subject}
-											onChange={handleChange}
-										/>
-									</div>
-
-									<div className='form-group'>
-										<label htmlFor='message'>Message</label>
-										<textarea
-											id='message'
-											name='message'
-											rows='7'
-											value={formData.message}
-											onChange={handleChange}
-										/>
-									</div>
-
-									{statusMessage && (
-										<p className={isSuccess ? 'contact-form__success' : 'contact-form__error'}>
-											{statusMessage}
-										</p>
-									)}
-
-									<button type='submit' disabled={submitting}>
-										{submitting ? 'Sending...' : 'Send Message'}
-									</button>
-								</form>
-							</div>
+								<button type='submit' disabled={submitting}>
+									{submitting ? 'Sending...' : 'Send Message'}
+								</button>
+							</form>
 						</div>
 					</div>
-				</section>
-
-				<PublicFooter />
-			</main>
-		</>
+				</div>
+			</section>
+		</PublicPageShell>
 	)
 }

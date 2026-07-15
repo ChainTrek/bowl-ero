@@ -1,9 +1,8 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import Autoplay from 'embla-carousel-autoplay'
+import PublicPageShell from '../components/layout/PublicPageShell'
 import { getPublicCafeMenuItems } from '../services/supabase/publicCafeMenu'
-import PublicNavbar from '../components/layout/PublicNavbar'
-import PublicFooter from '../components/public/PublicFooter'
 
 export default function CafePublicPage() {
 	const [items, setItems] = useState([])
@@ -80,99 +79,84 @@ export default function CafePublicPage() {
 	}
 
 	return (
-		<>
-			<PublicNavbar />
-
-			<main className='public-page public-destination-page'>
-				<section className='public-section public-section--tight public-destination-hero'>
-					<div className='public-container'>
-						<div className='public-section-header'>
-							<span className='public-eyebrow'>Food & Drinks</span>
-							<h1 className='public-heading'>Cafe Menu</h1>
-							<p className='public-subheading'>
-								Browse the cafe menu boards and see the current food and drink offerings.
-							</p>
-						</div>
-					</div>
-				</section>
-
-				<section className='cafe-menu-section public-section'>
-					<div className='cafe-menu-section__inner public-container'>
-						{loading ? (
-							<p className='public-loading'>Loading menu...</p>
-						) : errorMessage ? (
-							<p className='public-error'>{errorMessage}</p>
-						) : items.length === 0 ? (
-							<p className='public-empty'>No menu items available right now.</p>
-						) : (
-							<div className='cafe-carousel'>
-								<div className='cafe-carousel__viewport' ref={emblaRef}>
-									<div className='cafe-carousel__container'>
-										{items.map(item => (
-											<div className='cafe-carousel__slide' key={item.id}>
-												<article className='cafe-slide-card'>
-													{item.image_url && (
-														<div className='cafe-slide-card__image-wrapper'>
-															<img
-																className='cafe-slide-card__image'
-																src={item.image_url}
-																alt={item.name}
-															/>
-														</div>
-													)}
-
-													<div className='cafe-slide-card__details'>
-														<h2>{item.name}</h2>
-														{item.description && <p>{item.description}</p>}
+		<PublicPageShell
+			eyebrow='Food & Drinks'
+			title='Cafe Menu'
+			description='Browse the cafe menu boards and see the current food and drink offerings.'
+			mainClassName='cafe-page'
+		>
+			<section className='cafe-menu-section public-section'>
+				<div className='cafe-menu-section__inner public-container'>
+					{loading ? (
+						<p className='public-loading'>Loading menu...</p>
+					) : errorMessage ? (
+						<p className='public-error'>{errorMessage}</p>
+					) : items.length === 0 ? (
+						<p className='public-empty'>No menu items available right now.</p>
+					) : (
+						<div className='cafe-carousel'>
+							<div className='cafe-carousel__viewport' ref={emblaRef}>
+								<div className='cafe-carousel__container'>
+									{items.map(item => (
+										<div className='cafe-carousel__slide' key={item.id}>
+											<article className='cafe-slide-card'>
+												{item.image_url && (
+													<div className='cafe-slide-card__image-wrapper'>
+														<img
+															className='cafe-slide-card__image'
+															src={item.image_url}
+															alt={item.name}
+														/>
 													</div>
-												</article>
-											</div>
+												)}
+
+												<div className='cafe-slide-card__details'>
+													<h2>{item.name}</h2>
+													{item.description && <p>{item.description}</p>}
+												</div>
+											</article>
+										</div>
+									))}
+								</div>
+							</div>
+
+							{items.length > 1 && (
+								<div className='cafe-carousel__controls'>
+									<button
+										type='button'
+										className='cafe-carousel__button'
+										onClick={handlePrev}
+									>
+										Previous
+									</button>
+
+									<div className='cafe-carousel__dots'>
+										{items.map((item, index) => (
+											<button
+												key={item.id}
+												type='button'
+												className={`cafe-carousel__dot ${
+													index === selectedIndex ? 'cafe-carousel__dot--active' : ''
+												}`}
+												onClick={() => handleDotClick(index)}
+												aria-label={`Go to cafe item ${index + 1}`}
+											/>
 										))}
 									</div>
+
+									<button
+										type='button'
+										className='cafe-carousel__button'
+										onClick={handleNext}
+									>
+										Next
+									</button>
 								</div>
-
-								{items.length > 1 && (
-									<div className='cafe-carousel__controls'>
-										<button
-											type='button'
-											className='cafe-carousel__button'
-											onClick={handlePrev}
-										>
-											Previous
-										</button>
-
-										<div className='cafe-carousel__dots'>
-											{items.map((item, index) => (
-												<button
-													key={item.id}
-													type='button'
-													className={`cafe-carousel__dot ${
-														index === selectedIndex
-															? 'cafe-carousel__dot--active'
-															: ''
-													}`}
-													onClick={() => handleDotClick(index)}
-													aria-label={`Go to cafe item ${index + 1}`}
-												/>
-											))}
-										</div>
-
-										<button
-											type='button'
-											className='cafe-carousel__button'
-											onClick={handleNext}
-										>
-											Next
-										</button>
-									</div>
-								)}
-							</div>
-						)}
-					</div>
-				</section>
-
-				<PublicFooter />
-			</main>
-		</>
+							)}
+						</div>
+					)}
+				</div>
+			</section>
+		</PublicPageShell>
 	)
 }
