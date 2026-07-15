@@ -9,7 +9,7 @@
 
 .tournament-card {
   @include publicMixins.card-surface;
-  padding: 1.35rem;
+  @include publicMixins.card-content-block(1.35rem, 0.75rem);
 
   &__content {
     display: grid;
@@ -22,9 +22,7 @@
   }
 
   h2 {
-    color: #f8fafc;
-    font-size: 1.2rem;
-    line-height: 1.25;
+    @include publicMixins.content-title(1.2rem);
   }
 
   p {
