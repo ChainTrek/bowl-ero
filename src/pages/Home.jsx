@@ -4,6 +4,7 @@ import { getPublicTournaments } from '../services/supabase/publicTournaments'
 import { getPublicLeaguesWithScores } from '../services/supabase/publicScores'
 import { getPublicCafeMenuItems } from '../services/supabase/publicCafeMenu'
 import { formatDisplayDate } from '../utils/formatDisplayDate'
+import { formatScoreLine } from '../utils/formatScoreLine'
 import PublicNavbar from '../components/layout/PublicNavbar'
 import PublicFooter from '../components/public/PublicFooter'
 import AnnouncementsSection from '../components/public/AnnouncementsSection'
@@ -25,10 +26,21 @@ export default function Home() {
 					getPublicLeaguesWithScores(),
 					getPublicCafeMenuItems(),
 				])
+				const cafeItems = cafeData ?? []
+				const itemsWithImages = cafeItems.filter(item => item.image_url)
 
 				setPreviewTournaments((tournamentsData ?? []).slice(0, 2))
 				setPreviewLeagues((leaguesData ?? []).slice(0, 2))
-				setPreviewCafeItems((cafeData ?? []).slice(0, 1))
+
+				if (itemsWithImages.length > 0) {
+					const randomIndex = Math.floor(Math.random() * itemsWithImages.length)
+					setPreviewCafeItems([itemsWithImages[randomIndex]])
+				} else if (cafeItems.length > 0) {
+					const randomIndex = Math.floor(Math.random() * cafeItems.length)
+					setPreviewCafeItems([cafeItems[randomIndex]])
+				} else {
+					setPreviewCafeItems([])
+				}
 			} catch (error) {
 				console.error('Unable to load home previews:', error)
 				setPreviewTournaments([])
@@ -105,6 +117,13 @@ export default function Home() {
 											<div key={item.id} className='home-preview-card__item'>
 												<strong>{item.title}</strong>
 												<p>{formatDisplayDate(item.tournament_date)}</p>
+												{item.description && (
+													<p className='home-preview-card__meta'>
+														{item.description.length > 90
+															? `${item.description.slice(0, 90)}...`
+															: item.description}
+													</p>
+												)}
 											</div>
 										))}
 									</div>
@@ -128,7 +147,8 @@ export default function Home() {
 										{previewLeagues.map(league => (
 											<div key={league.id} className='home-preview-card__item'>
 												<strong>{league.name}</strong>
-												<p>
+
+												<p className='home-preview-card__meta'>
 													{league.latestWeek
 														? `${league.latestWeek.week_label}${
 																league.latestWeek.week_date
@@ -137,6 +157,16 @@ export default function Home() {
 															}`
 														: 'No scores posted yet'}
 												</p>
+
+												{league.playerScores?.length > 0 && (
+													<div className='home-preview-card__score-list'>
+														{league.playerScores.slice(0, 2).map(score => (
+															<p key={score.id}>
+																{formatScoreLine(score)}
+															</p>
+														))}
+													</div>
+												)}
 											</div>
 										))}
 									</div>
@@ -168,7 +198,11 @@ export default function Home() {
 										<div className='home-preview-card__item'>
 											<strong>{previewCafeItems[0].name}</strong>
 											{previewCafeItems[0].description && (
-												<p>{previewCafeItems[0].description}</p>
+												<p className='home-preview-card__meta'>
+													{previewCafeItems[0].description.length > 110
+														? `${previewCafeItems[0].description.slice(0, 110)}...`
+														: previewCafeItems[0].description}
+												</p>
 											)}
 										</div>
 									</div>
