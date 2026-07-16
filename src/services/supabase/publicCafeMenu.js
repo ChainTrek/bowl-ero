@@ -1,16 +1,16 @@
-import { supabase } from './client';
+import { supabase } from './client'
 
 export async function getPublicCafeMenuItems() {
-  const { data, error } = await supabase
-    .from('cafe_menu_items')
-    .select('*')
-    .eq('is_active', true)
-    .order('display_order', { ascending: true })
-    .order('name', { ascending: true });
+	const { data, error } = await supabase
+		.from('cafe_menu_items')
+		.select('*')
+		.eq('is_active', true)
+		.order('display_order', { ascending: true })
+		.order('name', { ascending: true })
 
-  if (error) {
-    throw new Error(error.message);
-  }
+	if (error) {
+		throw new Error(error.message)
+	}
 
-  return data || [];
+	return data ?? []
 }

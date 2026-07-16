@@ -4,6 +4,7 @@ import {
 	uploadCafeMenuImage,
 	createCafeMenuItem,
 	updateCafeMenuItem,
+	replaceCafeMenuItemImage,
 	toggleCafeMenuItemActive,
 	deleteCafeMenuItem,
 } from '../../services/supabase/cafeMenu'
@@ -18,19 +19,32 @@ const initialForm = {
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024
 
+function sortItems(items) {
+	return [...items].sort((a, b) => {
+		const displayOrderCompare = Number(a.display_order ?? 0) - Number(b.display_order ?? 0)
+		if (displayOrderCompare !== 0) return displayOrderCompare
+		return String(a.name ?? '').localeCompare(String(b.name ?? ''))
+	})
+}
+
 export default function CafeMenuPage() {
 	const [items, setItems] = useState([])
 	const [formData, setFormData] = useState(initialForm)
 	const [imageFile, setImageFile] = useState(null)
 	const [editingItemId, setEditingItemId] = useState(null)
+	const [editingImagePath, setEditingImagePath] = useState('')
+	const [editingImageUrl, setEditingImageUrl] = useState('')
 	const [loading, setLoading] = useState(true)
 	const [submitting, setSubmitting] = useState(false)
-	const [statusMessage, setStatusMessage] = useState('')
+	const [errorMessage, setErrorMessage] = useState('')
+	const [successMessage, setSuccessMessage] = useState('')
 
 	const imagePreviewUrl = useMemo(() => {
 		if (!imageFile) return ''
 		return URL.createObjectURL(imageFile)
 	}, [imageFile])
+
+	const isEditing = Boolean(editingItemId)
 
 	useEffect(() => {
 		loadItems()
@@ -47,13 +61,29 @@ export default function CafeMenuPage() {
 	async function loadItems() {
 		try {
 			setLoading(true)
+			setErrorMessage('')
+
 			const data = await getCafeMenuItems()
-			setItems(data)
+			setItems(sortItems(data))
 		} catch (error) {
-			setStatusMessage(`Error loading menu items: ${error.message}`)
+			setErrorMessage(`Error loading menu items: ${error.message}`)
 		} finally {
 			setLoading(false)
 		}
+	}
+
+	function clearFileInput() {
+		const fileInput = document.getElementById('menu-image')
+		if (fileInput) fileInput.value = ''
+	}
+
+	function resetForm() {
+		setFormData(initialForm)
+		setImageFile(null)
+		setEditingItemId(null)
+		setEditingImagePath('')
+		setEditingImageUrl('')
+		clearFileInput()
 	}
 
 	function handleChange(event) {
@@ -87,67 +117,83 @@ export default function CafeMenuPage() {
 		const validationMessage = validateImageFile(file)
 
 		if (validationMessage) {
-			setStatusMessage(validationMessage)
+			setErrorMessage(validationMessage)
+			setSuccessMessage('')
 			setImageFile(null)
 			event.target.value = ''
 			return
 		}
 
-		setStatusMessage('')
+		setErrorMessage('')
+		setSuccessMessage('')
 		setImageFile(file)
 	}
 
 	function handleEditClick(item) {
 		setEditingItemId(item.id)
+		setEditingImagePath(item.image_path || '')
+		setEditingImageUrl(item.image_url || '')
 		setFormData({
 			name: item.name || '',
 			description: item.description || '',
-			is_active: item.is_active,
+			is_active: item.is_active ?? true,
 			display_order: item.display_order ?? 0,
 		})
 		setImageFile(null)
-		setStatusMessage('')
-		const fileInput = document.getElementById('menu-image')
-		if (fileInput) fileInput.value = ''
+		setErrorMessage('')
+		setSuccessMessage('')
+		clearFileInput()
 	}
 
 	function handleCancelEdit() {
-		setEditingItemId(null)
-		setFormData(initialForm)
-		setImageFile(null)
-		setStatusMessage('')
-		const fileInput = document.getElementById('menu-image')
-		if (fileInput) fileInput.value = ''
+		resetForm()
+		setErrorMessage('')
+		setSuccessMessage('')
 	}
 
 	async function handleSubmit(event) {
 		event.preventDefault()
 
-		if (!formData.name.trim()) {
-			setStatusMessage('Menu item title is required.')
+		const trimmedName = formData.name.trim()
+		const trimmedDescription = formData.description.trim()
+
+		if (!trimmedName) {
+			setErrorMessage('Menu item title is required.')
+			setSuccessMessage('')
 			return
 		}
 
 		try {
 			setSubmitting(true)
-			setStatusMessage('')
+			setErrorMessage('')
+			setSuccessMessage('')
 
-			if (editingItemId) {
-				const updatedItem = await updateCafeMenuItem(editingItemId, {
-					name: formData.name.trim(),
-					description: formData.description.trim() || null,
+			if (isEditing) {
+				let updatedItem = await updateCafeMenuItem(editingItemId, {
+					name: trimmedName,
+					description: trimmedDescription || null,
 					is_active: formData.is_active,
 					display_order: Number(formData.display_order) || 0,
 				})
 
-				setItems(prev => prev.map(item => (item.id === editingItemId ? updatedItem : item)))
+				if (imageFile) {
+					updatedItem = await replaceCafeMenuItemImage(
+						editingItemId,
+						imageFile,
+						editingImagePath || null,
+					)
+				}
 
-				setStatusMessage('Menu item updated successfully.')
+				setItems(prev =>
+					sortItems(prev.map(item => (item.id === editingItemId ? updatedItem : item))),
+				)
+
+				setSuccessMessage('Menu item updated successfully.')
 			} else {
 				const fileValidationMessage = validateImageFile(imageFile)
 
 				if (fileValidationMessage) {
-					setStatusMessage(fileValidationMessage)
+					setErrorMessage(fileValidationMessage)
 					setSubmitting(false)
 					return
 				}
@@ -155,26 +201,22 @@ export default function CafeMenuPage() {
 				const { imagePath, imageUrl } = await uploadCafeMenuImage(imageFile)
 
 				const newItem = await createCafeMenuItem({
-					name: formData.name.trim(),
-					description: formData.description.trim() || null,
+					name: trimmedName,
+					description: trimmedDescription || null,
 					image_path: imagePath,
 					image_url: imageUrl,
 					is_active: formData.is_active,
 					display_order: Number(formData.display_order) || 0,
 				})
 
-				setItems(prev => [...prev, newItem])
-				setStatusMessage('Menu item added successfully.')
+				setItems(prev => sortItems([...prev, newItem]))
+				setSuccessMessage('Menu item added successfully.')
 			}
 
-			setFormData(initialForm)
-			setImageFile(null)
-			setEditingItemId(null)
-
-			const fileInput = document.getElementById('menu-image')
-			if (fileInput) fileInput.value = ''
+			resetForm()
 		} catch (error) {
-			setStatusMessage(`Error ${editingItemId ? 'updating' : 'adding'} menu item: ${error.message}`)
+			setErrorMessage(`Error ${isEditing ? 'updating' : 'adding'} menu item: ${error.message}`)
+			setSuccessMessage('')
 		} finally {
 			setSubmitting(false)
 		}
@@ -188,9 +230,12 @@ export default function CafeMenuPage() {
 		if (!confirmed) return
 
 		try {
+			setErrorMessage('')
+			setSuccessMessage('')
+
 			const updatedItem = await toggleCafeMenuItemActive(item.id, item.is_active)
 
-			setItems(prev => prev.map(entry => (entry.id === item.id ? updatedItem : entry)))
+			setItems(prev => sortItems(prev.map(entry => (entry.id === item.id ? updatedItem : entry))))
 
 			if (editingItemId === item.id) {
 				setFormData(prev => ({
@@ -199,9 +244,12 @@ export default function CafeMenuPage() {
 				}))
 			}
 
-			setStatusMessage(`Menu item ${updatedItem.is_active ? 'reactivated' : 'deactivated'} successfully.`)
+			setSuccessMessage(
+				`Menu item ${updatedItem.is_active ? 'reactivated' : 'deactivated'} successfully.`,
+			)
 		} catch (error) {
-			setStatusMessage(`Error changing menu item status: ${error.message}`)
+			setErrorMessage(`Error changing menu item status: ${error.message}`)
+			setSuccessMessage('')
 		}
 	}
 
@@ -211,16 +259,20 @@ export default function CafeMenuPage() {
 		if (!confirmed) return
 
 		try {
-			await deleteCafeMenuItem(item.id)
+			setErrorMessage('')
+			setSuccessMessage('')
+
+			await deleteCafeMenuItem(item.id, item.image_path || null)
 			setItems(prev => prev.filter(entry => entry.id !== item.id))
 
 			if (editingItemId === item.id) {
-				handleCancelEdit()
+				resetForm()
 			}
 
-			setStatusMessage('Menu item deleted successfully.')
+			setSuccessMessage('Menu item deleted successfully.')
 		} catch (error) {
-			setStatusMessage(`Error deleting menu item: ${error.message}`)
+			setErrorMessage(`Error deleting menu item: ${error.message}`)
+			setSuccessMessage('')
 		}
 	}
 
@@ -228,11 +280,11 @@ export default function CafeMenuPage() {
 		<section className='admin-page cafe-menu-page'>
 			<div className='admin-page__header'>
 				<h1>Cafe Menu</h1>
-				<p>Add full menu images without changing code.</p>
+				<p>Add and manage full menu images without changing code.</p>
 			</div>
 
 			<div className='admin-card'>
-				<h2>{editingItemId ? 'Edit Menu Item' : 'Add Menu Item'}</h2>
+				<h2>{isEditing ? 'Edit Menu Item' : 'Add Menu Item'}</h2>
 
 				<form className='menu-form' onSubmit={handleSubmit}>
 					<div className='form-group'>
@@ -286,51 +338,52 @@ export default function CafeMenuPage() {
 						</div>
 					</div>
 
-					{!editingItemId && (
-						<div className='form-group'>
-							<label htmlFor='menu-image'>Menu Image</label>
-							<input
-								id='menu-image'
-								type='file'
-								accept='image/png,image/jpeg,image/webp'
-								onChange={handleFileChange}
-							/>
-							<small>Allowed: JPG, PNG, WEBP. Max size: 2 MB.</small>
+					<div className='form-group'>
+						<label htmlFor='menu-image'>
+							{isEditing ? 'Replace Menu Image (Optional)' : 'Menu Image'}
+						</label>
+						<input
+							id='menu-image'
+							type='file'
+							accept='image/png,image/jpeg,image/webp'
+							onChange={handleFileChange}
+						/>
+						<small>Allowed: JPG, PNG, WEBP. Max size: 2 MB.</small>
+					</div>
+
+					{isEditing && editingImageUrl && !imagePreviewUrl && (
+						<div className='image-preview'>
+							<p>Current Image</p>
+							<img src={editingImageUrl} alt={formData.name || 'Current menu item'} />
 						</div>
 					)}
 
-					{editingItemId && (
-						<p className='helper-text'>
-							Image replacement is not included yet. This edit mode updates the title and
-							description only.
-						</p>
-					)}
-
-					{imagePreviewUrl && !editingItemId && (
+					{imagePreviewUrl && (
 						<div className='image-preview'>
-							<p>Image Preview</p>
+							<p>{isEditing ? 'New Image Preview' : 'Image Preview'}</p>
 							<img src={imagePreviewUrl} alt='Selected menu item preview' />
 						</div>
 					)}
 
 					<div className='form-actions'>
 						<button type='submit' disabled={submitting}>
-							{submitting ? 'Saving...' : editingItemId ? 'Update Menu Item' : 'Add Menu Item'}
+							{submitting ? 'Saving...' : isEditing ? 'Update Menu Item' : 'Add Menu Item'}
 						</button>
 
-						{editingItemId && (
+						{isEditing && (
 							<button type='button' className='secondary-button' onClick={handleCancelEdit}>
 								Cancel Edit
 							</button>
 						)}
 					</div>
+
+					{successMessage && <p className='status-message status-message--success'>{successMessage}</p>}
+					{errorMessage && <p className='status-message status-message--error'>{errorMessage}</p>}
 				</form>
 			</div>
 
 			<div className='admin-card'>
 				<h2>Current Menu Items</h2>
-
-				{statusMessage && <p className='status-message'>{statusMessage}</p>}
 
 				{loading ? (
 					<p>Loading menu items...</p>
@@ -353,6 +406,12 @@ export default function CafeMenuPage() {
 
 								<div className='menu-item-admin__content'>
 									<h3>{item.name}</h3>
+									<p>
+										<strong>Status:</strong> {item.is_active ? 'Active' : 'Inactive'}
+									</p>
+									<p>
+										<strong>Display Order:</strong> {item.display_order ?? 0}
+									</p>
 									{item.description && <p>{item.description}</p>}
 
 									<div className='menu-item-admin__actions'>
@@ -372,17 +431,13 @@ export default function CafeMenuPage() {
 											{item.is_active ? 'Deactivate' : 'Reactivate'}
 										</button>
 
-										<details className='advanced-actions'>
-											<summary>Advanced Actions</summary>
-
-											<button
-												type='button'
-												className='danger-button'
-												onClick={() => handleDelete(item)}
-											>
-												Delete Permanently
-											</button>
-										</details>
+										<button
+											type='button'
+											className='danger-button'
+											onClick={() => handleDelete(item)}
+										>
+											Delete
+										</button>
 									</div>
 								</div>
 							</article>

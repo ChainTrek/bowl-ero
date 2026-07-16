@@ -85,16 +85,16 @@ export default function CafePublicPage() {
 			title='Cafe Menu'
 			description='Browse the cafe menu boards and see the current food and drink offerings.'
 		>
-			<PublicContentSection
-				sectionClassName='cafe-menu-section'
-				containerClassName='cafe-menu-section__inner'
-			>
+			<PublicContentSection sectionClassName='cafe-menu-section' containerClassName='cafe-menu-section__inner'>
 				{loading ? (
 					<p className='public-loading'>Loading menu...</p>
 				) : errorMessage ? (
 					<p className='public-error'>{errorMessage}</p>
 				) : items.length === 0 ? (
-					<p className='public-empty'>No menu items available right now.</p>
+					<div className='cafe-menu-section__empty public-card'>
+						<h2>No cafe menu is available right now.</h2>
+						<p>Please check back soon for updated menu boards and current offerings.</p>
+					</div>
 				) : (
 					<div className='cafe-carousel'>
 						<div className='cafe-carousel__viewport' ref={emblaRef}>
@@ -113,8 +113,13 @@ export default function CafePublicPage() {
 											)}
 
 											<div className='cafe-slide-card__details'>
+												<span className='cafe-slide-card__eyebrow'>Menu Board</span>
 												<h2>{item.name}</h2>
-												{item.description && <p>{item.description}</p>}
+												<p className='cafe-slide-card__description'>
+													{item.description?.trim()
+														? item.description
+														: 'Current menu board on display.'}
+												</p>
 											</div>
 										</article>
 									</div>
@@ -124,11 +129,7 @@ export default function CafePublicPage() {
 
 						{items.length > 1 && (
 							<div className='cafe-carousel__controls'>
-								<button
-									type='button'
-									className='cafe-carousel__button'
-									onClick={handlePrev}
-								>
+								<button type='button' className='cafe-carousel__button' onClick={handlePrev}>
 									Previous
 								</button>
 
@@ -146,11 +147,7 @@ export default function CafePublicPage() {
 									))}
 								</div>
 
-								<button
-									type='button'
-									className='cafe-carousel__button'
-									onClick={handleNext}
-								>
+								<button type='button' className='cafe-carousel__button' onClick={handleNext}>
 									Next
 								</button>
 							</div>
