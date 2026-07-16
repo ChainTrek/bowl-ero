@@ -1,70 +1,85 @@
 import { useEffect, useState } from 'react'
 import PublicPageShell from '../components/layout/PublicPageShell'
-import { getPublicTournaments } from '../services/supabase/publicTournaments'
+import PublicContentSection from '../components/layout/PublicContentSection'
+import { getPublicLeaguesWithScores } from '../services/supabase/publicScores'
+import { formatScoreLine } from '../utils/formatScoreLine'
 import { formatDisplayDate } from '../utils/formatDisplayDate'
 
-export default function TournamentsPublicPage() {
-	const [tournaments, setTournaments] = useState([])
+export default function LeagueScoresPublicPage() {
+	const [leagues, setLeagues] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [errorMessage, setErrorMessage] = useState('')
 
 	useEffect(() => {
-		async function loadTournaments() {
+		async function loadLeagueScores() {
 			try {
 				setLoading(true)
 				setErrorMessage('')
 
-				const data = await getPublicTournaments()
-				setTournaments(data ?? [])
+				const data = await getPublicLeaguesWithScores()
+				setLeagues(data ?? [])
 			} catch (error) {
-				setErrorMessage(error.message || 'Unable to load tournaments right now.')
+				setErrorMessage(`Unable to load league scores: ${error.message}`)
 			} finally {
 				setLoading(false)
 			}
 		}
 
-		loadTournaments()
+		loadLeagueScores()
 	}, [])
 
 	return (
 		<PublicPageShell
-			eyebrow='Events'
-			title='Tournaments'
-			description='Stay up to date with upcoming tournaments, event details, and registration information.'
+			eyebrow='Competition'
+			title='League Scores'
+			description='Check current weekly league scores and keep up with standings and performance.'
 		>
-			<section className='public-section tournaments-section'>
-				<div className='tournaments-section__inner public-container'>
-					{loading ? (
-						<p className='public-loading'>Loading tournaments...</p>
-					) : errorMessage ? (
-						<p className='public-error'>{errorMessage}</p>
-					) : tournaments.length === 0 ? (
-						<p className='public-empty'>No upcoming tournaments posted right now.</p>
-					) : (
-						<div className='tournaments-section__list'>
-							{tournaments.map(item => (
-								<article className='tournament-card' key={item.id}>
-									<div className='tournament-card__content'>
-										<h2>{item.title}</h2>
-										<p>{formatDisplayDate(item.tournament_date)}</p>
-										{item.description && <p>{item.description}</p>}
-										{item.registration_url && (
-											<a
-												className='tournament-card__link'
-												href={item.registration_url}
-												target='_blank'
-												rel='noreferrer'
-											>
-												Register Online
-											</a>
+			<PublicContentSection
+				sectionClassName='league-scores-section'
+				containerClassName='league-scores-section__inner'
+			>
+				{loading ? (
+					<p className='public-loading'>Loading league scores...</p>
+				) : errorMessage ? (
+					<p className='public-error'>{errorMessage}</p>
+				) : leagues.length === 0 ? (
+					<p className='public-empty'>No active leagues found.</p>
+				) : (
+					<div className='league-scores-section__grid'>
+						{leagues.map(league => (
+							<article className='league-score-card' key={league.id}>
+								<div className='league-score-card__header'>
+									<h2>{league.name}</h2>
+									{league.day_of_week && <p>{league.day_of_week}</p>}
+								</div>
+
+								{!league.latestWeek ? (
+									<p>No weekly scores posted yet.</p>
+								) : (
+									<>
+										<div className='league-score-card__week'>
+											<p>{league.latestWeek.week_label}</p>
+											{league.latestWeek.week_date && (
+												<small>{formatDisplayDate(league.latestWeek.week_date)}</small>
+											)}
+										</div>
+
+										{league.playerScores.length === 0 ? (
+											<p>No player scores posted yet.</p>
+										) : (
+											<div className='league-score-card__scores'>
+												{league.playerScores.map(score => (
+													<p key={score.id}>{formatScoreLine(score)}</p>
+												))}
+											</div>
 										)}
-									</div>
-								</article>
-							))}
-						</div>
-					)}
-				</div>
-			</section>
+									</>
+								)}
+							</article>
+						))}
+					</div>
+				)}
+			</PublicContentSection>
 		</PublicPageShell>
 	)
 }

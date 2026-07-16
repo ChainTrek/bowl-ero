@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import PublicPageShell from '../components/layout/PublicPageShell'
+import PublicContentSection from '../components/layout/PublicContentSection'
+import PublicTwoColumnLayout from '../components/layout/PublicTwoColumnLayout'
 import PublicInfoPanel from '../components/public/PublicInfoPanel'
 import { createPublicMessage } from '../services/supabase/publicContact'
 
@@ -98,91 +100,91 @@ export default function ContactPage() {
 			description='Send a message to Bowl-Ero and a member of the team will review it and get back to you as soon as possible.'
 			mainClassName='contact-page'
 		>
-			<section className='public-section'>
-				<div className='public-container'>
-					<div className='contact-page__layout'>
-						<div className='contact-page__info public-card'>
-							<PublicInfoPanel
-								eyebrow='Reach Out'
-								title='We’d love to hear from you'
-								description='Use this form to ask a question, send feedback, or reach out about leagues, tournaments, events, or general information.'
-								items={contactInfoItems}
-							/>
-						</div>
+			<PublicContentSection>
+				<PublicTwoColumnLayout
+					className='contact-page__layout'
+					leftClassName='contact-page__info public-card'
+					rightClassName='contact-page__form-wrapper public-card'
+					left={
+						<PublicInfoPanel
+							eyebrow='Reach Out'
+							title='We’d love to hear from you'
+							description='Use this form to ask a question, send feedback, or reach out about leagues, tournaments, events, or general information.'
+							items={contactInfoItems}
+						/>
+					}
+					right={
+						<form className='contact-form public-form' onSubmit={handleSubmit}>
+							<div className='form-group'>
+								<label htmlFor='name'>Name</label>
+								<input
+									id='name'
+									name='name'
+									type='text'
+									value={formData.name}
+									onChange={handleChange}
+								/>
+							</div>
 
-						<div className='contact-page__form-wrapper public-card'>
-							<form className='contact-form public-form' onSubmit={handleSubmit}>
+							<div className='form-row'>
 								<div className='form-group'>
-									<label htmlFor='name'>Name</label>
+									<label htmlFor='email'>Email</label>
 									<input
-										id='name'
-										name='name'
-										type='text'
-										value={formData.name}
+										id='email'
+										name='email'
+										type='email'
+										value={formData.email}
 										onChange={handleChange}
 									/>
 								</div>
 
-								<div className='form-row'>
-									<div className='form-group'>
-										<label htmlFor='email'>Email</label>
-										<input
-											id='email'
-											name='email'
-											type='email'
-											value={formData.email}
-											onChange={handleChange}
-										/>
-									</div>
-
-									<div className='form-group'>
-										<label htmlFor='phone'>Phone</label>
-										<input
-											id='phone'
-											name='phone'
-											type='tel'
-											value={formData.phone}
-											onChange={handleChange}
-										/>
-									</div>
-								</div>
-
 								<div className='form-group'>
-									<label htmlFor='subject'>Subject</label>
+									<label htmlFor='phone'>Phone</label>
 									<input
-										id='subject'
-										name='subject'
-										type='text'
-										value={formData.subject}
+										id='phone'
+										name='phone'
+										type='tel'
+										value={formData.phone}
 										onChange={handleChange}
 									/>
 								</div>
+							</div>
 
-								<div className='form-group'>
-									<label htmlFor='message'>Message</label>
-									<textarea
-										id='message'
-										name='message'
-										rows='7'
-										value={formData.message}
-										onChange={handleChange}
-									/>
-								</div>
+							<div className='form-group'>
+								<label htmlFor='subject'>Subject</label>
+								<input
+									id='subject'
+									name='subject'
+									type='text'
+									value={formData.subject}
+									onChange={handleChange}
+								/>
+							</div>
 
-								{statusMessage && (
-									<p className={isSuccess ? 'public-form__success' : 'public-form__error'}>
-										{statusMessage}
-									</p>
-								)}
+							<div className='form-group'>
+								<label htmlFor='message'>Message</label>
+								<textarea
+									id='message'
+									name='message'
+									rows='7'
+									value={formData.message}
+									onChange={handleChange}
+								/>
+							</div>
 
-								<button type='submit' disabled={submitting}>
-									{submitting ? 'Sending...' : 'Send Message'}
-								</button>
-							</form>
-						</div>
-					</div>
-				</div>
-			</section>
+							{statusMessage && (
+								<p className={isSuccess ? 'public-form__success' : 'public-form__error'}>
+									{statusMessage}
+								</p>
+							)}
+
+							<button type='submit' disabled={submitting}>
+								{submitting ? 'Sending...' : 'Send Message'}
+							</button>
+						</form>
+					}
+				/>
+			</PublicContentSection>
 		</PublicPageShell>
 	)
 }

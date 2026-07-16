@@ -56,6 +56,18 @@
   margin: 0 auto;
 }
 
+.public-two-column-layout {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 1.5rem;
+  align-items: start;
+
+  &__left,
+  &__right {
+    min-width: 0;
+  }
+}
+
 .public-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -299,5 +311,11 @@
 
   .public-section-header {
     margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .public-two-column-layout {
+    grid-template-columns: 1fr;
   }
 }
