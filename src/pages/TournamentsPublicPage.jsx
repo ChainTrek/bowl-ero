@@ -33,22 +33,34 @@ export default function TournamentsPublicPage() {
 			title='Tournaments'
 			description='Stay up to date with upcoming tournaments, event details, and registration information.'
 		>
-			<PublicContentSection sectionClassName='tournaments-section' containerClassName='tournaments-section__inner'>
+			<PublicContentSection sectionClassName='tournaments-section'>
 				{loading ? (
 					<p className='public-loading'>Loading tournaments...</p>
 				) : errorMessage ? (
 					<p className='public-error'>{errorMessage}</p>
 				) : tournaments.length === 0 ? (
-					<p className='public-empty'>No upcoming tournaments posted right now.</p>
+					<div className='tournaments-section__empty public-card'>
+						<h2>No upcoming tournaments posted right now.</h2>
+						<p>Please check back soon for new tournament dates and registration details.</p>
+					</div>
 				) : (
 					<div className='tournaments-section__list'>
 						{tournaments.map(item => (
 							<article className='tournament-card' key={item.id}>
 								<div className='tournament-card__content'>
 									<h2>{item.title}</h2>
-									<p>{formatDisplayDate(item.tournament_date)}</p>
-									{item.description && <p>{item.description}</p>}
-									{item.registration_url && (
+
+									<p className='tournament-card__date'>
+										{formatDisplayDate(item.tournament_date)}
+									</p>
+
+									<p className='tournament-card__description'>
+										{item.description?.trim()
+											? item.description
+											: 'More tournament details will be posted soon.'}
+									</p>
+
+									{item.registration_url ? (
 										<a
 											className='tournament-card__link'
 											href={item.registration_url}
@@ -57,6 +69,10 @@ export default function TournamentsPublicPage() {
 										>
 											Register Online
 										</a>
+									) : (
+										<p className='tournament-card__registration-note'>
+											Registration link coming soon.
+										</p>
 									)}
 								</div>
 							</article>

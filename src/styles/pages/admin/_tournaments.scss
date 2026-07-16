@@ -1,3 +1,13 @@
+.tournaments-page {
+  &__list-header {
+    margin-bottom: 1rem;
+
+    h2 {
+      margin-bottom: 0.75rem;
+    }
+  }
+}
+
 .tournament-form {
   display: grid;
   gap: 1rem;
@@ -6,6 +16,10 @@
   input,
   button {
     font: inherit;
+  }
+
+  &__checkbox {
+    align-self: end;
   }
 }
 
@@ -36,16 +50,30 @@
     margin: 0.25rem 0;
     color: #52606d;
   }
+
+  a {
+    color: #1d4ed8;
+    word-break: break-word;
+  }
+}
+
+.tournament-item__info {
+  min-width: 0;
 }
 
 .tournament-item__actions {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 @media (max-width: 768px) {
   .tournament-item {
     flex-direction: column;
+  }
+
+  .tournament-item__actions {
+    justify-content: flex-start;
   }
 }
