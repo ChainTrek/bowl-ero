@@ -4,6 +4,7 @@ import {
 	getLeagueWeeks,
 	createLeagueWeek,
 	updateLeagueWeek,
+	deleteLeagueWeek,
 	getPlayerScoresByWeek,
 	createPlayerScore,
 	createMultiplePlayerScores,
@@ -45,6 +46,31 @@ function normalizeNumber(value) {
 	return value === '' ? null : Number(value)
 }
 
+function sortWeeks(items) {
+	return [...items].sort((a, b) => {
+		const aDate = a.week_date || ''
+		const bDate = b.week_date || ''
+		const dateCompare = bDate.localeCompare(aDate)
+		if (dateCompare !== 0) return dateCompare
+
+		const aCreated = a.created_at || ''
+		const bCreated = b.created_at || ''
+		return bCreated.localeCompare(aCreated)
+	})
+}
+
+function sortScores(items) {
+	return [...items].sort((a, b) => {
+		const displayOrderCompare = Number(a.display_order ?? 0) - Number(b.display_order ?? 0)
+		if (displayOrderCompare !== 0) return displayOrderCompare
+
+		const createdCompare = String(a.created_at || '').localeCompare(String(b.created_at || ''))
+		if (createdCompare !== 0) return createdCompare
+
+		return String(a.player_name || '').localeCompare(String(b.player_name || ''))
+	})
+}
+
 function buildScorePayload(row, selectedWeekId) {
 	return {
 		league_week_id: selectedWeekId,
@@ -68,6 +94,7 @@ function isBulkRowValid(row) {
 export default function ScoresPage() {
 	const [leagues, setLeagues] = useState([])
 	const [weeks, setWeeks] = useState([])
+	const [selectedLeagueId, setSelectedLeagueId] = useState('')
 	const [selectedWeekId, setSelectedWeekId] = useState(null)
 
 	const [playerScores, setPlayerScores] = useState([])
@@ -85,13 +112,28 @@ export default function ScoresPage() {
 	const [submittingWeek, setSubmittingWeek] = useState(false)
 	const [submittingScore, setSubmittingScore] = useState(false)
 	const [submittingBulk, setSubmittingBulk] = useState(false)
-	const [statusMessage, setStatusMessage] = useState('')
+	const [errorMessage, setErrorMessage] = useState('')
+	const [successMessage, setSuccessMessage] = useState('')
+
+	const filteredWeeks = useMemo(() => {
+		if (!selectedLeagueId) return weeks
+		return weeks.filter(week => String(week.league_id) === String(selectedLeagueId))
+	}, [weeks, selectedLeagueId])
 
 	const selectedWeek = useMemo(() => weeks.find(week => week.id === selectedWeekId) || null, [weeks, selectedWeekId])
 
 	useEffect(() => {
 		loadPageData()
 	}, [])
+
+	useEffect(() => {
+		if (selectedLeagueId && !weekFormData.league_id && !editingWeekId) {
+			setWeekFormData(prev => ({
+				...prev,
+				league_id: selectedLeagueId,
+			}))
+		}
+	}, [selectedLeagueId, weekFormData.league_id, editingWeekId])
 
 	useEffect(() => {
 		if (selectedWeekId) {
@@ -101,20 +143,45 @@ export default function ScoresPage() {
 		}
 	}, [selectedWeekId])
 
+	useEffect(() => {
+		if (!selectedLeagueId) return
+
+		const weekStillVisible = filteredWeeks.some(week => week.id === selectedWeekId)
+
+		if (!weekStillVisible) {
+			setSelectedWeekId(filteredWeeks[0]?.id ?? null)
+			setEditingScoreId(null)
+			setScoreFormData(initialScoreForm)
+		}
+	}, [filteredWeeks, selectedLeagueId, selectedWeekId])
+
 	async function loadPageData() {
 		try {
 			setLoading(true)
+			setErrorMessage('')
 
 			const [leagueData, weekData] = await Promise.all([getActiveLeagues(), getLeagueWeeks()])
 
-			setLeagues(leagueData)
-			setWeeks(weekData)
+			const sortedLeagueData = leagueData ?? []
+			const sortedWeekData = sortWeeks(weekData ?? [])
 
-			if (weekData.length > 0) {
-				setSelectedWeekId(weekData[0].id)
-			}
+			setLeagues(sortedLeagueData)
+			setWeeks(sortedWeekData)
+
+			const firstLeagueId = sortedLeagueData[0]?.id ? String(sortedLeagueData[0].id) : ''
+			setSelectedLeagueId(firstLeagueId)
+
+			const initialWeek =
+				sortedWeekData.find(week => String(week.league_id) === firstLeagueId) || sortedWeekData[0] || null
+
+			setSelectedWeekId(initialWeek?.id ?? null)
+
+			setWeekFormData(prev => ({
+				...prev,
+				league_id: firstLeagueId,
+			}))
 		} catch (error) {
-			setStatusMessage(`Error loading scores data: ${error.message}`)
+			setErrorMessage(`Error loading scores data: ${error.message}`)
 		} finally {
 			setLoading(false)
 		}
@@ -123,13 +190,25 @@ export default function ScoresPage() {
 	async function loadPlayerScores(weekId) {
 		try {
 			setScoreLoading(true)
+			setErrorMessage('')
 			const data = await getPlayerScoresByWeek(weekId)
-			setPlayerScores(data)
+			setPlayerScores(sortScores(data))
 		} catch (error) {
-			setStatusMessage(`Error loading player scores: ${error.message}`)
+			setErrorMessage(`Error loading player scores: ${error.message}`)
 		} finally {
 			setScoreLoading(false)
 		}
+	}
+
+	function clearMessages() {
+		setErrorMessage('')
+		setSuccessMessage('')
+	}
+
+	function handleLeagueFilterChange(event) {
+		const nextLeagueId = event.target.value
+		setSelectedLeagueId(nextLeagueId)
+		clearMessages()
 	}
 
 	function handleWeekChange(event) {
@@ -169,27 +248,39 @@ export default function ScoresPage() {
 		setBulkRows([createBulkRow(0), createBulkRow(1), createBulkRow(2)])
 	}
 
+	function resetWeekForm(nextLeagueId = selectedLeagueId) {
+		setWeekFormData({
+			...initialWeekForm,
+			league_id: nextLeagueId || '',
+		})
+		setEditingWeekId(null)
+	}
+
+	function resetScoreForm() {
+		setScoreFormData(initialScoreForm)
+		setEditingScoreId(null)
+	}
+
 	function handleEditWeekClick(week) {
 		setEditingWeekId(week.id)
+		setSelectedLeagueId(String(week.league_id))
 		setWeekFormData({
 			league_id: String(week.league_id ?? ''),
 			week_label: week.week_label || '',
 			week_date: week.week_date || '',
 		})
-		setStatusMessage('')
+		clearMessages()
 	}
 
 	function handleCancelWeekEdit() {
-		setEditingWeekId(null)
-		setWeekFormData(initialWeekForm)
-		setStatusMessage('')
+		resetWeekForm()
+		clearMessages()
 	}
 
 	function handleSelectWeek(weekId) {
 		setSelectedWeekId(weekId)
-		setEditingScoreId(null)
-		setScoreFormData(initialScoreForm)
-		setStatusMessage('')
+		resetScoreForm()
+		clearMessages()
 	}
 
 	function handleEditScoreClick(score) {
@@ -203,31 +294,32 @@ export default function ScoresPage() {
 			series: score.series ?? '',
 			display_order: score.display_order ?? 0,
 		})
-		setStatusMessage('')
+		clearMessages()
 	}
 
 	function handleCancelScoreEdit() {
-		setEditingScoreId(null)
-		setScoreFormData(initialScoreForm)
-		setStatusMessage('')
+		resetScoreForm()
+		clearMessages()
 	}
 
 	async function handleWeekSubmit(event) {
 		event.preventDefault()
 
 		if (!weekFormData.league_id) {
-			setStatusMessage('Please choose a league.')
+			setErrorMessage('Please choose a league.')
+			setSuccessMessage('')
 			return
 		}
 
 		if (!weekFormData.week_label.trim()) {
-			setStatusMessage('Week label is required.')
+			setErrorMessage('Week label is required.')
+			setSuccessMessage('')
 			return
 		}
 
 		try {
 			setSubmittingWeek(true)
-			setStatusMessage('')
+			clearMessages()
 
 			const payload = {
 				league_id: Number(weekFormData.league_id),
@@ -238,22 +330,59 @@ export default function ScoresPage() {
 			if (editingWeekId) {
 				const updatedWeek = await updateLeagueWeek(editingWeekId, payload)
 
-				setWeeks(prev => prev.map(week => (week.id === editingWeekId ? updatedWeek : week)))
-
-				setStatusMessage('Weekly entry updated successfully.')
+				setWeeks(prev => sortWeeks(prev.map(week => (week.id === editingWeekId ? updatedWeek : week))))
+				setSelectedLeagueId(String(updatedWeek.league_id))
+				setSelectedWeekId(updatedWeek.id)
+				setSuccessMessage('Weekly entry updated successfully.')
 			} else {
 				const newWeek = await createLeagueWeek(payload)
-				setWeeks(prev => [newWeek, ...prev])
+				setWeeks(prev => sortWeeks([newWeek, ...prev]))
+				setSelectedLeagueId(String(newWeek.league_id))
 				setSelectedWeekId(newWeek.id)
-				setStatusMessage('Weekly entry created successfully.')
+				setSuccessMessage('Weekly entry created successfully.')
 			}
 
-			setWeekFormData(initialWeekForm)
-			setEditingWeekId(null)
+			resetWeekForm(String(payload.league_id))
 		} catch (error) {
-			setStatusMessage(`Error ${editingWeekId ? 'updating' : 'creating'} weekly entry: ${error.message}`)
+			setErrorMessage(`Error ${editingWeekId ? 'updating' : 'creating'} weekly entry: ${error.message}`)
+			setSuccessMessage('')
 		} finally {
 			setSubmittingWeek(false)
+		}
+	}
+
+	async function handleDeleteWeek(week) {
+		const confirmed = window.confirm(
+			`Delete "${week.week_label}" for ${week.leagues?.name || 'this league'}?\n\nAll player scores for this week will also be deleted.`,
+		)
+
+		if (!confirmed) return
+
+		try {
+			clearMessages()
+
+			await deleteLeagueWeek(week.id)
+			const remainingWeeks = weeks.filter(item => item.id !== week.id)
+			setWeeks(sortWeeks(remainingWeeks))
+
+			if (selectedWeekId === week.id) {
+				const replacementWeek =
+					remainingWeeks.find(item => String(item.league_id) === String(selectedLeagueId)) ||
+					remainingWeeks[0] ||
+					null
+				setSelectedWeekId(replacementWeek?.id ?? null)
+				setPlayerScores([])
+				resetScoreForm()
+			}
+
+			if (editingWeekId === week.id) {
+				resetWeekForm()
+			}
+
+			setSuccessMessage('Weekly entry deleted successfully.')
+		} catch (error) {
+			setErrorMessage(`Error deleting weekly entry: ${error.message}`)
+			setSuccessMessage('')
 		}
 	}
 
@@ -261,12 +390,14 @@ export default function ScoresPage() {
 		event.preventDefault()
 
 		if (!selectedWeekId) {
-			setStatusMessage('Please select a weekly entry first.')
+			setErrorMessage('Please select a weekly entry first.')
+			setSuccessMessage('')
 			return
 		}
 
 		if (!scoreFormData.player_name.trim()) {
-			setStatusMessage('Player name is required.')
+			setErrorMessage('Player name is required.')
+			setSuccessMessage('')
 			return
 		}
 
@@ -280,13 +411,14 @@ export default function ScoresPage() {
 		const gamesEntered = [game1, game2, game3].filter(game => game !== null).length
 
 		if (gamesEntered === 0) {
-			setStatusMessage('Enter at least one game score.')
+			setErrorMessage('Enter at least one game score.')
+			setSuccessMessage('')
 			return
 		}
 
 		try {
 			setSubmittingScore(true)
-			setStatusMessage('')
+			clearMessages()
 
 			const payload = {
 				league_week_id: selectedWeekId,
@@ -302,20 +434,21 @@ export default function ScoresPage() {
 			if (editingScoreId) {
 				const updatedScore = await updatePlayerScore(editingScoreId, payload)
 
-				setPlayerScores(prev => prev.map(score => (score.id === editingScoreId ? updatedScore : score)))
-
-				setStatusMessage('Player score updated successfully.')
+				setPlayerScores(prev =>
+					sortScores(prev.map(score => (score.id === editingScoreId ? updatedScore : score))),
+				)
+				setSuccessMessage('Player score updated successfully.')
 			} else {
 				const newScore = await createPlayerScore(payload)
 
-				setPlayerScores(prev => [...prev, newScore])
-				setStatusMessage('Player score added successfully.')
+				setPlayerScores(prev => sortScores([...prev, newScore]))
+				setSuccessMessage('Player score added successfully.')
 			}
 
-			setScoreFormData(initialScoreForm)
-			setEditingScoreId(null)
+			resetScoreForm()
 		} catch (error) {
-			setStatusMessage(`Error ${editingScoreId ? 'updating' : 'adding'} player score: ${error.message}`)
+			setErrorMessage(`Error ${editingScoreId ? 'updating' : 'adding'} player score: ${error.message}`)
+			setSuccessMessage('')
 		} finally {
 			setSubmittingScore(false)
 		}
@@ -325,29 +458,32 @@ export default function ScoresPage() {
 		event.preventDefault()
 
 		if (!selectedWeekId) {
-			setStatusMessage('Please select a weekly entry first.')
+			setErrorMessage('Please select a weekly entry first.')
+			setSuccessMessage('')
 			return
 		}
 
 		const validRows = bulkRows.filter(isBulkRowValid)
 
 		if (validRows.length === 0) {
-			setStatusMessage('Enter at least one valid score row before saving.')
+			setErrorMessage('Enter at least one valid score row before saving.')
+			setSuccessMessage('')
 			return
 		}
 
 		try {
 			setSubmittingBulk(true)
-			setStatusMessage('')
+			clearMessages()
 
 			const payload = validRows.map(row => buildScorePayload(row, selectedWeekId))
 			const insertedRows = await createMultiplePlayerScores(payload)
 
-			setPlayerScores(prev => [...prev, ...insertedRows])
+			setPlayerScores(prev => sortScores([...prev, ...insertedRows]))
 			resetBulkRows()
-			setStatusMessage(`${insertedRows.length} player score row(s) added successfully.`)
+			setSuccessMessage(`${insertedRows.length} player score row(s) added successfully.`)
 		} catch (error) {
-			setStatusMessage(`Error adding bulk player scores: ${error.message}`)
+			setErrorMessage(`Error adding bulk player scores: ${error.message}`)
+			setSuccessMessage('')
 		} finally {
 			setSubmittingBulk(false)
 		}
@@ -359,6 +495,8 @@ export default function ScoresPage() {
 		if (!confirmed) return
 
 		try {
+			clearMessages()
+
 			await deletePlayerScore(score.id)
 			setPlayerScores(prev => prev.filter(item => item.id !== score.id))
 
@@ -366,9 +504,10 @@ export default function ScoresPage() {
 				handleCancelScoreEdit()
 			}
 
-			setStatusMessage('Player score deleted successfully.')
+			setSuccessMessage('Player score deleted successfully.')
 		} catch (error) {
-			setStatusMessage(`Error deleting player score: ${error.message}`)
+			setErrorMessage(`Error deleting player score: ${error.message}`)
+			setSuccessMessage('')
 		}
 	}
 
@@ -452,17 +591,40 @@ export default function ScoresPage() {
 			</div>
 
 			<div className='admin-card'>
-				<h2>Existing Weekly Entries</h2>
+				<div className='scores-page__week-header'>
+					<div>
+						<h2>Existing Weekly Entries</h2>
+						<p>Filter by league to keep score entry focused.</p>
+					</div>
 
-				{statusMessage && <p className='status-message'>{statusMessage}</p>}
+					<div className='form-group scores-page__league-filter'>
+						<label htmlFor='selected-league-filter'>League Filter</label>
+						<select
+							id='selected-league-filter'
+							value={selectedLeagueId}
+							onChange={handleLeagueFilterChange}
+						>
+							<option value=''>All leagues</option>
+							{leagues.map(league => (
+								<option key={league.id} value={league.id}>
+									{league.name}
+									{league.day_of_week ? ` (${league.day_of_week})` : ''}
+								</option>
+							))}
+						</select>
+					</div>
+				</div>
+
+				{successMessage && <p className='status-message status-message--success'>{successMessage}</p>}
+				{errorMessage && <p className='status-message status-message--error'>{errorMessage}</p>}
 
 				{loading ? (
 					<p>Loading weekly entries...</p>
-				) : weeks.length === 0 ? (
-					<p>No weekly entries found yet.</p>
+				) : filteredWeeks.length === 0 ? (
+					<p>No weekly entries found for the selected league.</p>
 				) : (
 					<div className='score-week-list'>
-						{weeks.map(week => (
+						{filteredWeeks.map(week => (
 							<article
 								className={`score-week-item ${
 									selectedWeekId === week.id ? 'score-week-item--selected' : ''
@@ -493,6 +655,14 @@ export default function ScoresPage() {
 										onClick={() => handleEditWeekClick(week)}
 									>
 										Edit
+									</button>
+
+									<button
+										type='button'
+										className='danger-button'
+										onClick={() => handleDeleteWeek(week)}
+									>
+										Delete
 									</button>
 								</div>
 							</article>
@@ -818,17 +988,13 @@ export default function ScoresPage() {
 													Edit
 												</button>
 
-												<details className='advanced-actions'>
-													<summary>Advanced Actions</summary>
-
-													<button
-														type='button'
-														className='danger-button'
-														onClick={() => handleDeleteScore(score)}
-													>
-														Delete Permanently
-													</button>
-												</details>
+												<button
+													type='button'
+													className='danger-button'
+													onClick={() => handleDeleteScore(score)}
+												>
+													Delete
+												</button>
 											</div>
 										</article>
 									))}

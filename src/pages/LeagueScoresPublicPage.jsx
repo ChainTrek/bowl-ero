@@ -43,7 +43,10 @@ export default function LeagueScoresPublicPage() {
 				) : errorMessage ? (
 					<p className='public-error'>{errorMessage}</p>
 				) : leagues.length === 0 ? (
-					<p className='public-empty'>No active leagues found.</p>
+					<div className='league-scores-section__empty public-card'>
+						<h2>No league scores are available right now.</h2>
+						<p>Please check back soon for the latest weekly score updates.</p>
+					</div>
 				) : (
 					<div className='league-scores-section__grid'>
 						{leagues.map(league => (
@@ -54,18 +57,27 @@ export default function LeagueScoresPublicPage() {
 								</div>
 
 								{!league.latestWeek ? (
-									<p>No weekly scores posted yet.</p>
+									<div className='league-score-card__empty-state'>
+										<p>Scores for this league will be posted soon.</p>
+									</div>
 								) : (
 									<>
 										<div className='league-score-card__week'>
+											<span className='league-score-card__week-label'>
+												Latest Week
+											</span>
 											<p>{league.latestWeek.week_label}</p>
 											{league.latestWeek.week_date && (
-												<small>{formatDisplayDate(league.latestWeek.week_date)}</small>
+												<small>
+													{formatDisplayDate(league.latestWeek.week_date)}
+												</small>
 											)}
 										</div>
 
 										{league.playerScores.length === 0 ? (
-											<p>No player scores posted yet.</p>
+											<div className='league-score-card__empty-state'>
+												<p>No player scores have been posted for this week yet.</p>
+											</div>
 										) : (
 											<div className='league-score-card__scores'>
 												{league.playerScores.map(score => (
