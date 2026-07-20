@@ -5,6 +5,7 @@ import {
 	updateReservationBlockout,
 	deleteReservationBlockout,
 } from '../../services/supabase/reservations'
+import ReservationAvailabilityPreview from '../../components/admin/ReservationAvailabilityPreview'
 
 const initialForm = {
 	title: '',
@@ -389,6 +390,7 @@ export default function ReservationBlockoutsPage() {
 					</div>
 				)}
 			</div>
+			<ReservationAvailabilityPreview blockouts={blockouts} />
 		</section>
 	)
 }

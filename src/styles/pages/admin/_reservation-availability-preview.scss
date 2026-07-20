@@ -1,0 +1,36 @@
+.reservation-availability-preview {
+  &__form {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  &__result {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid #d9e2ec;
+
+    h3 {
+      margin: 0 0 0.5rem;
+    }
+
+    p {
+      margin: 0.25rem 0;
+    }
+
+    &--available {
+      background-color: #f0fdf4;
+      border-color: #86efac;
+    }
+
+    &--blocked {
+      background-color: #fff7ed;
+      border-color: #fdba74;
+    }
+  }
+
+  &__details {
+    margin-top: 0.75rem;
+  }
+}
