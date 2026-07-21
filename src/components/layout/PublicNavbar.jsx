@@ -1,77 +1,85 @@
-import { Link, NavLink } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
+
+const NAV_LINKS = [
+	{ to: '/', label: 'Home', end: true },
+	{ to: '/tournaments', label: 'Tournaments' },
+	{ to: '/league-scores', label: 'League Scores' },
+	{ to: '/cafe', label: 'Cafe' },
+	{ to: '/reservations', label: 'Reservations' },
+	{ to: '/contact', label: 'Contact' },
+	{ to: '/employment', label: 'Employment' },
+]
 
 export default function PublicNavbar() {
+	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+	const location = useLocation()
+
+	useEffect(() => {
+		setIsMobileMenuOpen(false)
+	}, [location.pathname])
+
+	useEffect(() => {
+		function handleResize() {
+			if (window.innerWidth > 900) {
+				setIsMobileMenuOpen(false)
+			}
+		}
+
+		window.addEventListener('resize', handleResize)
+		return () => window.removeEventListener('resize', handleResize)
+	}, [])
+
+	function toggleMobileMenu() {
+		setIsMobileMenuOpen(prev => !prev)
+	}
+
+	function closeMobileMenu() {
+		setIsMobileMenuOpen(false)
+	}
+
 	return (
 		<header className='public-navbar'>
 			<div className='public-container public-navbar__inner'>
-				<Link to='/' className='public-navbar__brand'>
+				<Link to='/' className='public-navbar__brand' onClick={closeMobileMenu}>
 					Bowl-Ero
 				</Link>
 
-				<nav className='public-navbar__nav' aria-label='Public site navigation'>
-					<NavLink
-						to='/'
-						end
-						className={({ isActive }) =>
-							`public-navbar__link ${isActive ? 'public-navbar__link--active' : ''}`
-						}
-					>
-						Home
-					</NavLink>
+				<button
+					type='button'
+					className={`public-navbar__toggle ${
+						isMobileMenuOpen ? 'public-navbar__toggle--open' : ''
+					}`}
+					aria-expanded={isMobileMenuOpen}
+					aria-controls='public-site-navigation'
+					aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+					onClick={toggleMobileMenu}
+				>
+					<span className='public-navbar__toggle-line' />
+					<span className='public-navbar__toggle-line' />
+					<span className='public-navbar__toggle-line' />
+				</button>
 
-					<NavLink
-						to='/tournaments'
-						className={({ isActive }) =>
-							`public-navbar__link ${isActive ? 'public-navbar__link--active' : ''}`
-						}
-					>
-						Tournaments
-					</NavLink>
-
-					<NavLink
-						to='/league-scores'
-						className={({ isActive }) =>
-							`public-navbar__link ${isActive ? 'public-navbar__link--active' : ''}`
-						}
-					>
-						League Scores
-					</NavLink>
-
-					<NavLink
-						to='/cafe'
-						className={({ isActive }) =>
-							`public-navbar__link ${isActive ? 'public-navbar__link--active' : ''}`
-						}
-					>
-						Cafe
-					</NavLink>
-
-					<NavLink
-						to='/reservations'
-						className={({ isActive }) =>
-							`public-navbar__link ${isActive ? 'public-navbar__link--active' : ''}`
-						}
-					>
-						Reservations
-					</NavLink>
-
-					<NavLink
-						to='/contact'
-						className={({ isActive }) =>
-							`public-navbar__link ${isActive ? 'public-navbar__link--active' : ''}`
-						}
-					>
-						Contact
-					</NavLink>
-
-					<NavLink
-						to='/employment'
-						className={({ isActive }) =>
-							`public-navbar__link ${isActive ? 'public-navbar__link--active' : ''}`
-						}
-					>
-						Employment
-					</NavLink>
+				<nav
+					id='public-site-navigation'
+					className={`public-navbar__nav ${
+						isMobileMenuOpen ? 'public-navbar__nav--open' : ''
+					}`}
+					aria-label='Public site navigation'
+				>
+					{NAV_LINKS.map(link => (
+						<NavLink
+							key={link.to}
+							to={link.to}
+							end={link.end}
+							onClick={closeMobileMenu}
+							className={({ isActive }) =>
+								`public-navbar__link ${isActive ? 'public-navbar__link--active' : ''}`
+							}
+						>
+							{link.label}
+						</NavLink>
+					))}
 				</nav>
 			</div>
 		</header>
