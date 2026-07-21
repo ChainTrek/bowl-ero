@@ -21,6 +21,7 @@
 @use './pages/admin/reservation-blockouts';
 @use './pages/admin/employment-applications';
 @use './pages/admin/employment-application-detail';
+@use './pages/admin/reservation-requests';
 
 @use './pages/public/home-shared';
 @use './pages/public/design-system';
@@ -34,5 +35,6 @@
 @use './pages/public/contact';
 @use './pages/public/employment';
 @use './pages/public/forms-shared';
+@use './pages/public/reservations';
 
 @use './pages/admin/reservation-availability-preview';

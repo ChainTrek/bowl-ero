@@ -26,6 +26,7 @@ export default function Home() {
 					getPublicLeaguesWithScores(),
 					getPublicCafeMenuItems(),
 				])
+
 				const cafeItems = cafeData ?? []
 				const itemsWithImages = cafeItems.filter(item => item.image_url)
 
@@ -58,7 +59,7 @@ export default function Home() {
 		<>
 			<PublicNavbar />
 
-			<main className='home-page public-page'>
+			<main className='public-page'>
 				<section className='hero-section public-section public-section--tight'>
 					<div className='public-container hero-section__content'>
 						<span className='public-eyebrow'>Bowl-Ero Lanes</span>
@@ -78,12 +79,12 @@ export default function Home() {
 
 							<div className='hero-section__text'>
 								<h1 className='public-heading public-heading--hero'>
-									Bowling, food, leagues, and events with a more modern feel.
+									Bowling, food, leagues, events, and party reservations with a more modern feel.
 								</h1>
 
 								<p className='public-subheading public-subheading--hero'>
-									Check announcements, tournaments, league scores, and cafe highlights all in
-									one place.
+									Check announcements, tournaments, league scores, cafe highlights, and submit
+									a reservation request all in one place.
 								</p>
 							</div>
 						</div>
@@ -98,7 +99,8 @@ export default function Home() {
 							<span className='public-eyebrow'>Explore</span>
 							<h2 className='public-heading'>Quick Access</h2>
 							<p className='public-subheading'>
-								Jump into tournaments, league scores, and the cafe menu from the home page.
+								Jump into tournaments, league scores, cafe highlights, and reservation requests
+								from the home page.
 							</p>
 						</div>
 
@@ -161,9 +163,7 @@ export default function Home() {
 												{league.playerScores?.length > 0 && (
 													<div className='home-preview-card__score-list'>
 														{league.playerScores.slice(0, 2).map(score => (
-															<p key={score.id}>
-																{formatScoreLine(score)}
-															</p>
+															<p key={score.id}>{formatScoreLine(score)}</p>
 														))}
 													</div>
 												)}
@@ -210,6 +210,33 @@ export default function Home() {
 
 								<Link to='/cafe' className='primary-link-button'>
 									View Full Cafe Menu
+								</Link>
+							</article>
+
+							<article className='public-card home-preview-card'>
+								<span className='home-preview-card__eyebrow'>Reservations</span>
+								<h3>Plan a party request</h3>
+
+								<div className='home-preview-card__list'>
+									<div className='home-preview-card__item'>
+										<strong>Request your preferred date and time</strong>
+										<p className='home-preview-card__meta'>
+											Submit a party reservation request and our team will review it before
+											confirmation.
+										</p>
+									</div>
+
+									<div className='home-preview-card__item'>
+										<strong>Availability is checked first</strong>
+										<p className='home-preview-card__meta'>
+											Blockouts for tournaments, maintenance, and special events are checked
+											before you send your request.
+										</p>
+									</div>
+								</div>
+
+								<Link to='/reservations' className='primary-link-button'>
+									Request a Reservation
 								</Link>
 							</article>
 						</div>

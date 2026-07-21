@@ -17,6 +17,7 @@ export default function AdminSidebar() {
 				<NavLink to='/admin/tournaments'>Tournaments</NavLink>
 				<NavLink to='/admin/scores'>Scores</NavLink>
 				<NavLink to='/admin/reservation-blockouts'>Reservation Blockouts</NavLink>
+				<NavLink to='/admin/reservation-requests'>Reservation Requests</NavLink>
 				<NavLink to='/admin/hours'>Hours</NavLink>
 				<NavLink to='/admin/announcements'>Announcements</NavLink>
 				<NavLink to='/admin/cafe-menu'>Cafe Menu</NavLink>

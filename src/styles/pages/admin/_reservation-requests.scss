@@ -1,0 +1,226 @@
+.reservation-requests-page {
+  &__filter-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+
+    h2 {
+      margin-bottom: 0.35rem;
+    }
+
+    p {
+      margin: 0;
+      color: #52606d;
+    }
+  }
+
+  &__filter {
+    min-width: 220px;
+  }
+}
+
+.reservation-request-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.reservation-request-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #d9e2ec;
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+
+  &--selected {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.25);
+  }
+
+  h3 {
+    margin: 0 0 0.35rem;
+  }
+
+  p {
+    margin: 0.25rem 0;
+    color: #52606d;
+  }
+}
+
+.reservation-request-item__info {
+  min-width: 0;
+}
+
+.reservation-request-item__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.reservation-request-review {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.reservation-request-review__details {
+  display: grid;
+  gap: 1rem;
+
+  h3 {
+    margin: 0;
+  }
+}
+
+.reservation-request-review__detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+
+  p {
+    margin: 0;
+    color: #52606d;
+  }
+}
+
+.reservation-request-review__notes {
+  padding: 1rem;
+  border: 1px solid #d9e2ec;
+  border-radius: 0.75rem;
+  background-color: #f8fafc;
+
+  h4 {
+    margin: 0 0 0.5rem;
+  }
+
+  p {
+    margin: 0;
+    color: #52606d;
+    line-height: 1.6;
+  }
+}
+
+.reservation-request-review__form {
+  display: grid;
+  gap: 1rem;
+
+  textarea,
+  input,
+  select,
+  button {
+    font: inherit;
+  }
+}
+
+.reservation-request-item__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.25rem 0 0.75rem;
+}
+
+.reservation-request-item__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+
+  &--package {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+  }
+
+  &--addons {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+
+  &--plain {
+    background-color: #e5e7eb;
+    color: #374151;
+  }
+}
+
+.reservation-request-item__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.25rem 0 0.75rem;
+}
+
+.reservation-request-item__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+
+  &--package {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+  }
+
+  &--addons {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+
+  &--plain {
+    background-color: #e5e7eb;
+    color: #374151;
+  }
+
+  &--status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+
+  &--status-approved {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+
+  &--status-declined {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+
+  &--status-cancelled {
+    background-color: #e5e7eb;
+    color: #374151;
+  }
+}
+
+@media (max-width: 900px) {
+  .reservation-request-review {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .reservation-request-item {
+    flex-direction: column;
+  }
+
+  .reservation-request-item__actions {
+    justify-content: flex-start;
+  }
+
+  .reservation-request-review__detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

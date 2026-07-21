@@ -36,6 +36,7 @@ export default function PublicFooter() {
 							<Link to='/tournaments'>Tournaments</Link>
 							<Link to='/league-scores'>League Scores</Link>
 							<Link to='/cafe'>Cafe</Link>
+							<Link to='/reservations'>Reservations</Link>
 							<Link to='/contact'>Contact Us</Link>
 							<Link to='/employment'>Employment</Link>
 						</div>

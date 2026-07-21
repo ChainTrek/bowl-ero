@@ -20,6 +20,8 @@ import TournamentsPublicPage from '../pages/TournamentsPublicPage'
 import LeagueScoresPublicPage from '../pages/LeagueScoresPublicPage'
 import CafePublicPage from '../pages/CafePublicPage'
 import ScrollToTop from './ScrollToTop'
+import ReservationsPage from '../pages/ReservationsPage'
+import ReservationRequestsPage from '../pages/admin/ReservationRequestsPage'
 
 export default function AppRouter() {
 	return (
@@ -53,7 +55,9 @@ export default function AppRouter() {
 					<Route path='reservation-blockouts' element={<ReservationBlockoutsPage />} />
 					<Route path='applications' element={<EmploymentApplicationsPage />} />
 					<Route path='applications/:id' element={<EmploymentApplicationDetailPage />} />
+					<Route path='reservation-requests' element={<ReservationRequestsPage />} />
 				</Route>
+				<Route path='/reservations' element={<ReservationsPage />} />
 			</Routes>
 		</BrowserRouter>
 	)
