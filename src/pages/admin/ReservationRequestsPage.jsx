@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useOutletContext } from 'react-router-dom'
 import {
 	getReservationRequests,
 	updateReservationRequest,
@@ -97,6 +98,7 @@ export default function ReservationRequestsPage() {
 	const [saving, setSaving] = useState(false)
 	const [errorMessage, setErrorMessage] = useState('')
 	const [successMessage, setSuccessMessage] = useState('')
+	const { refreshCounts } = useOutletContext()
 
 	const selectedRequest = useMemo(
 		() => requests.find(request => request.id === selectedRequestId) || null,
@@ -184,6 +186,8 @@ export default function ReservationRequestsPage() {
 			setRequests(prev =>
 				sortRequests(prev.map(item => (item.id === selectedRequest.id ? updatedRequest : item))),
 			)
+
+			await refreshCounts()
 
 			setSuccessMessage('Reservation request updated successfully.')
 		} catch (error) {
@@ -316,49 +320,18 @@ export default function ReservationRequestsPage() {
 							<h3>{selectedRequest.customer_name}</h3>
 
 							<div className='reservation-request-review__detail-grid'>
-								<p>
-									<strong>Phone:</strong> {selectedRequest.phone}
-								</p>
-								<p>
-									<strong>Email:</strong> {selectedRequest.email}
-								</p>
-								<p>
-									<strong>Event Date:</strong> {formatDate(selectedRequest.event_date)}
-								</p>
-								<p>
-									<strong>Event Time:</strong> {formatTime(selectedRequest.start_time)} -{' '}
-									{formatTime(selectedRequest.end_time)}
-								</p>
-								<p>
-									<strong>Guest Count:</strong>{' '}
-									{selectedRequest.guest_count ?? 'Not provided'}
-								</p>
-								<p>
-									<strong>Package:</strong>{' '}
-									{selectedRequest.package_type || 'Not provided'}
-								</p>
-								<p>
-									<strong>Extra Lanes:</strong> {selectedRequest.extra_lanes ?? 0}
-								</p>
-								<p>
-									<strong>Extra Pizzas:</strong> {selectedRequest.extra_pizzas ?? 0}
-								</p>
-								<p>
-									<strong>Extra Pitchers:</strong> {selectedRequest.extra_pitchers ?? 0}
-								</p>
-								<p>
-									<strong>Event Type:</strong>{' '}
-									{selectedRequest.event_type || 'Not provided'}
-								</p>
-								<p>
-									<strong>Submitted:</strong>{' '}
-									{selectedRequest.created_at
-										? new Date(selectedRequest.created_at).toLocaleString()
-										: 'Unknown'}
-								</p>
-								<p>
-									<strong>Current Status:</strong> {formatStatusLabel(selectedRequest.status)}
-								</p>
+								<p><strong>Phone:</strong> {selectedRequest.phone}</p>
+								<p><strong>Email:</strong> {selectedRequest.email}</p>
+								<p><strong>Event Date:</strong> {formatDate(selectedRequest.event_date)}</p>
+								<p><strong>Event Time:</strong> {formatTime(selectedRequest.start_time)} - {formatTime(selectedRequest.end_time)}</p>
+								<p><strong>Guest Count:</strong> {selectedRequest.guest_count ?? 'Not provided'}</p>
+								<p><strong>Package:</strong> {selectedRequest.package_type || 'Not provided'}</p>
+								<p><strong>Extra Lanes:</strong> {selectedRequest.extra_lanes ?? 0}</p>
+								<p><strong>Extra Pizzas:</strong> {selectedRequest.extra_pizzas ?? 0}</p>
+								<p><strong>Extra Pitchers:</strong> {selectedRequest.extra_pitchers ?? 0}</p>
+								<p><strong>Event Type:</strong> {selectedRequest.event_type || 'Not provided'}</p>
+								<p><strong>Submitted:</strong> {selectedRequest.created_at ? new Date(selectedRequest.created_at).toLocaleString() : 'Unknown'}</p>
+								<p><strong>Current Status:</strong> {formatStatusLabel(selectedRequest.status)}</p>
 							</div>
 
 							<div className='reservation-request-review__notes'>

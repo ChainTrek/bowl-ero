@@ -16,11 +16,11 @@ const initialForm = {
 const contactInfoItems = [
 	{
 		title: 'Visit',
-		lines: ['2530 Channing Way', 'Idaho Falls, ID'],
+		lines: ['670 1st St.', 'Idaho Falls, ID'],
 	},
 	{
 		title: 'Call',
-		lines: ['(208) 529-3000'],
+		lines: ['(208) 524-9400'],
 	},
 	{
 		title: 'Best for',

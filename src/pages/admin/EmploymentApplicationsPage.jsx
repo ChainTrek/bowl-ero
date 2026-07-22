@@ -1,24 +1,19 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useOutletContext } from 'react-router-dom'
 import { getEmploymentApplications } from '../../services/supabase/employmentApplications'
 import { formatDateTime } from '../../utils/formatDateTime'
 
-function getApplicationSubmittedBadgeClass() {
-	return 'employment-application-badge employment-application-badge--new'
-}
-
-function getPositionBadgeClass() {
-	return 'employment-application-badge employment-application-badge--position'
-}
-
-function getEmploymentTypeBadgeClass() {
-	return 'employment-application-badge employment-application-badge--type'
+function getReviewedBadgeClass(reviewed) {
+	return `employment-application-badge ${
+		reviewed ? 'employment-application-badge--reviewed' : 'employment-application-badge--new'
+	}`
 }
 
 export default function EmploymentApplicationsPage() {
 	const [applications, setApplications] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [statusMessage, setStatusMessage] = useState('')
+	const { refreshCounts } = useOutletContext()
 
 	useEffect(() => {
 		loadApplications()
@@ -27,8 +22,12 @@ export default function EmploymentApplicationsPage() {
 	async function loadApplications() {
 		try {
 			setLoading(true)
+			setStatusMessage('')
+
 			const data = await getEmploymentApplications()
 			setApplications(data)
+
+			await refreshCounts()
 		} catch (error) {
 			setStatusMessage(`Error loading applications: ${error.message}`)
 		} finally {
@@ -63,24 +62,28 @@ export default function EmploymentApplicationsPage() {
 										</h3>
 
 										<div className='employment-application-item__badges'>
-											<span className={getApplicationSubmittedBadgeClass()}>
-												Application Received
+											<span className={getReviewedBadgeClass(application.reviewed)}>
+												{application.reviewed ? 'Reviewed' : 'New Application'}
 											</span>
 
 											{application.position_desired && (
-												<span className={getPositionBadgeClass()}>
+												<span className='employment-application-badge employment-application-badge--position'>
 													{application.position_desired}
 												</span>
 											)}
 
 											{application.employment_type && (
-												<span className={getEmploymentTypeBadgeClass()}>
+												<span className='employment-application-badge employment-application-badge--type'>
 													{application.employment_type}
 												</span>
 											)}
 										</div>
 
 										<p>Submitted: {formatDateTime(application.created_at)}</p>
+
+										{application.reviewed && application.reviewed_at && (
+											<p>Reviewed: {formatDateTime(application.reviewed_at)}</p>
+										)}
 									</div>
 
 									<div className='employment-application-item__actions'>

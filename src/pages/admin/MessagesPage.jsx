@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useOutletContext } from 'react-router-dom'
 import {
 	getMessages,
 	updateMessageReadStatus,
@@ -19,6 +20,7 @@ export default function MessagesPage() {
 	const [loading, setLoading] = useState(true)
 	const [statusMessage, setStatusMessage] = useState('')
 	const [updatingMessageId, setUpdatingMessageId] = useState(null)
+	const { refreshCounts } = useOutletContext()
 
 	useEffect(() => {
 		loadMessages()
@@ -51,6 +53,8 @@ export default function MessagesPage() {
 			setMessages(prev =>
 				prev.map(item => (item.id === message.id ? updatedMessage : item))
 			)
+
+			await refreshCounts()
 
 			setStatusMessage(
 				`Message marked as ${updatedMessage.is_read ? 'read' : 'unread'}.`
