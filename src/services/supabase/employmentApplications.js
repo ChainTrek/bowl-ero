@@ -29,12 +29,6 @@ export async function getEmploymentApplicationById(id) {
 }
 
 export async function markEmploymentApplicationReviewed(id) {
-	const beforeRow = await getEmploymentApplicationById(id)
-
-	if (!beforeRow) {
-		throw new Error(`No application found for id: ${id}`)
-	}
-
 	const { error } = await supabase
 		.from('employment_applications')
 		.update({
@@ -44,20 +38,14 @@ export async function markEmploymentApplicationReviewed(id) {
 		.eq('id', id)
 
 	if (error) {
-		throw new Error(`Update failed: ${error.message}`)
+		throw new Error(error.message)
 	}
 
-	const afterRow = await getEmploymentApplicationById(id)
+	const refreshedRow = await getEmploymentApplicationById(id)
 
-	if (!afterRow) {
-		throw new Error(`Application disappeared after update for id: ${id}`)
+	if (!refreshedRow) {
+		throw new Error('Application was updated but could not be reloaded.')
 	}
 
-	if (afterRow.reviewed !== true) {
-		throw new Error(
-			`Application update did not persist. Before reviewed=${beforeRow.reviewed}, after reviewed=${afterRow.reviewed}`
-		)
-	}
-
-	return afterRow
+	return refreshedRow
 }

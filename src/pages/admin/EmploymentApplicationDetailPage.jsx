@@ -56,27 +56,13 @@ export default function EmploymentApplicationDetailPage() {
 			setMarkingReviewed(true)
 			setStatusMessage('')
 
-			console.log('Marking application reviewed for id:', id)
-			console.log('Application before update:', application)
-
 			const updatedApplication = await markEmploymentApplicationReviewed(id)
 
-			console.log('Updated application returned from service:', updatedApplication)
-
-			const refreshedApplication = await getEmploymentApplicationById(id)
-
-			console.log('Reloaded application from database:', refreshedApplication)
-
-			if (!refreshedApplication) {
-				throw new Error('Application was updated but could not be reloaded.')
-			}
-
-			setApplication(refreshedApplication)
+			setApplication(updatedApplication)
 			await refreshCounts()
 
 			setStatusMessage('Application marked as reviewed.')
 		} catch (error) {
-			console.error('Error marking application as reviewed:', error)
 			setStatusMessage(`Error updating application: ${error.message}`)
 		} finally {
 			setMarkingReviewed(false)

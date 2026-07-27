@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Link, useOutletContext } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { getEmploymentApplications } from '../../services/supabase/employmentApplications'
 import { formatDateTime } from '../../utils/formatDateTime'
 
 function getReviewedBadgeClass(reviewed) {
 	return `employment-application-badge ${
-		reviewed ? 'employment-application-badge--reviewed' : 'employment-application-badge--new'
+		reviewed
+			? 'employment-application-badge--reviewed'
+			: 'employment-application-badge--new'
 	}`
 }
 
@@ -13,7 +15,6 @@ export default function EmploymentApplicationsPage() {
 	const [applications, setApplications] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [statusMessage, setStatusMessage] = useState('')
-	const { refreshCounts } = useOutletContext()
 
 	useEffect(() => {
 		loadApplications()
@@ -26,8 +27,6 @@ export default function EmploymentApplicationsPage() {
 
 			const data = await getEmploymentApplications()
 			setApplications(data)
-
-			await refreshCounts()
 		} catch (error) {
 			setStatusMessage(`Error loading applications: ${error.message}`)
 		} finally {
@@ -45,7 +44,11 @@ export default function EmploymentApplicationsPage() {
 			<div className='admin-card'>
 				<h2>Submitted Applications</h2>
 
-				{statusMessage && <p className='status-message'>{statusMessage}</p>}
+				{statusMessage && (
+					<p className='status-message status-message--error'>
+						{statusMessage}
+					</p>
+				)}
 
 				{loading ? (
 					<p>Loading applications...</p>
@@ -54,7 +57,10 @@ export default function EmploymentApplicationsPage() {
 				) : (
 					<div className='employment-application-list'>
 						{applications.map(application => (
-							<article className='employment-application-item' key={application.id}>
+							<article
+								className='employment-application-item'
+								key={application.id}
+							>
 								<div className='employment-application-item__header'>
 									<div>
 										<h3>
@@ -62,8 +68,14 @@ export default function EmploymentApplicationsPage() {
 										</h3>
 
 										<div className='employment-application-item__badges'>
-											<span className={getReviewedBadgeClass(application.reviewed)}>
-												{application.reviewed ? 'Reviewed' : 'New Application'}
+											<span
+												className={getReviewedBadgeClass(
+													application.reviewed,
+												)}
+											>
+												{application.reviewed
+													? 'Reviewed'
+													: 'New Application'}
 											</span>
 
 											{application.position_desired && (
@@ -79,11 +91,20 @@ export default function EmploymentApplicationsPage() {
 											)}
 										</div>
 
-										<p>Submitted: {formatDateTime(application.created_at)}</p>
+										<p>
+											Submitted:{' '}
+											{formatDateTime(application.created_at)}
+										</p>
 
-										{application.reviewed && application.reviewed_at && (
-											<p>Reviewed: {formatDateTime(application.reviewed_at)}</p>
-										)}
+										{application.reviewed &&
+											application.reviewed_at && (
+												<p>
+													Reviewed:{' '}
+													{formatDateTime(
+														application.reviewed_at,
+													)}
+												</p>
+											)}
 									</div>
 
 									<div className='employment-application-item__actions'>

@@ -4,38 +4,32 @@ import {
 	getReservationRequests,
 	updateReservationRequest,
 } from '../../services/supabase/adminReservations'
+import {
+	formatReservationDate,
+	formatReservationTimeRange,
+} from '../../utils/reservations/formatters'
+import { formatDateTime } from '../../utils/formatDateTime'
 
-const STATUS_OPTIONS = ['pending', 'approved', 'declined', 'cancelled']
-
-function formatDate(value) {
-	if (!value) return 'No date set'
-
-	const [year, month, day] = value.split('-')
-	if (!year || !month || !day) return value
-
-	return `${month}/${day}/${year}`
-}
-
-function formatTime(value) {
-	if (!value) return ''
-
-	const [hours, minutes] = value.split(':')
-	if (hours === undefined || minutes === undefined) return value
-
-	const hourNumber = Number(hours)
-	const suffix = hourNumber >= 12 ? 'PM' : 'AM'
-	const normalizedHour = hourNumber % 12 || 12
-
-	return `${normalizedHour}:${minutes} ${suffix}`
-}
+const STATUS_OPTIONS = [
+	'pending',
+	'approved',
+	'declined',
+	'cancelled',
+]
 
 function sortRequests(items) {
 	return [...items].sort((a, b) => {
-		const createdCompare = String(b.created_at || '').localeCompare(String(a.created_at || ''))
-		if (createdCompare !== 0) return createdCompare
+		const createdCompare = String(
+			b.created_at || '',
+		).localeCompare(String(a.created_at || ''))
 
-		const dateCompare = String(b.event_date || '').localeCompare(String(a.event_date || ''))
-		return dateCompare
+		if (createdCompare !== 0) {
+			return createdCompare
+		}
+
+		return String(b.event_date || '').localeCompare(
+			String(a.event_date || ''),
+		)
 	})
 }
 
@@ -43,20 +37,32 @@ function buildAddOnSummary(request) {
 	const parts = []
 
 	if ((request.extra_lanes ?? 0) > 0) {
-		parts.push(`${request.extra_lanes} extra lane${request.extra_lanes === 1 ? '' : 's'}`)
+		parts.push(
+			`${request.extra_lanes} extra lane${
+				request.extra_lanes === 1 ? '' : 's'
+			}`,
+		)
 	}
 
 	if ((request.extra_pizzas ?? 0) > 0) {
-		parts.push(`${request.extra_pizzas} extra pizza${request.extra_pizzas === 1 ? '' : 's'}`)
+		parts.push(
+			`${request.extra_pizzas} extra pizza${
+				request.extra_pizzas === 1 ? '' : 's'
+			}`,
+		)
 	}
 
 	if ((request.extra_pitchers ?? 0) > 0) {
 		parts.push(
-			`${request.extra_pitchers} extra pitcher${request.extra_pitchers === 1 ? '' : 's'} of soda`,
+			`${request.extra_pitchers} extra pitcher${
+				request.extra_pitchers === 1 ? '' : 's'
+			} of soda`,
 		)
 	}
 
-	return parts.length > 0 ? parts.join(' • ') : 'No add-ons requested'
+	return parts.length > 0
+		? parts.join(' • ')
+		: 'No add-ons requested'
 }
 
 function hasAddOns(request) {
@@ -71,10 +77,13 @@ function getStatusBadgeClass(status) {
 	switch (status) {
 		case 'approved':
 			return 'reservation-request-item__badge reservation-request-item__badge--status-approved'
+
 		case 'declined':
 			return 'reservation-request-item__badge reservation-request-item__badge--status-declined'
+
 		case 'cancelled':
 			return 'reservation-request-item__badge reservation-request-item__badge--status-cancelled'
+
 		case 'pending':
 		default:
 			return 'reservation-request-item__badge reservation-request-item__badge--status-pending'
@@ -82,13 +91,17 @@ function getStatusBadgeClass(status) {
 }
 
 function formatStatusLabel(status) {
-	if (!status) return 'Pending'
+	if (!status) {
+		return 'Pending'
+	}
+
 	return status.charAt(0).toUpperCase() + status.slice(1)
 }
 
 export default function ReservationRequestsPage() {
 	const [requests, setRequests] = useState([])
-	const [selectedRequestId, setSelectedRequestId] = useState(null)
+	const [selectedRequestId, setSelectedRequestId] =
+		useState(null)
 	const [statusFilter, setStatusFilter] = useState('')
 	const [reviewForm, setReviewForm] = useState({
 		status: 'pending',
@@ -98,10 +111,14 @@ export default function ReservationRequestsPage() {
 	const [saving, setSaving] = useState(false)
 	const [errorMessage, setErrorMessage] = useState('')
 	const [successMessage, setSuccessMessage] = useState('')
+
 	const { refreshCounts } = useOutletContext()
 
 	const selectedRequest = useMemo(
-		() => requests.find(request => request.id === selectedRequestId) || null,
+		() =>
+			requests.find(
+				request => request.id === selectedRequestId,
+			) || null,
 		[requests, selectedRequestId],
 	)
 
@@ -110,7 +127,9 @@ export default function ReservationRequestsPage() {
 	}, [statusFilter])
 
 	useEffect(() => {
-		if (!selectedRequest) return
+		if (!selectedRequest) {
+			return
+		}
 
 		setReviewForm({
 			status: selectedRequest.status || 'pending',
@@ -124,21 +143,26 @@ export default function ReservationRequestsPage() {
 			setErrorMessage('')
 
 			const data = await getReservationRequests(status)
-			const sorted = sortRequests(data)
+			const sortedRequests = sortRequests(data)
 
-			setRequests(sorted)
+			setRequests(sortedRequests)
 
-			if (sorted.length === 0) {
+			if (sortedRequests.length === 0) {
 				setSelectedRequestId(null)
 				return
 			}
 
-			const selectedStillExists = sorted.some(item => item.id === selectedRequestId)
+			const selectedStillExists = sortedRequests.some(
+				request => request.id === selectedRequestId,
+			)
+
 			if (!selectedStillExists) {
-				setSelectedRequestId(sorted[0].id)
+				setSelectedRequestId(sortedRequests[0].id)
 			}
 		} catch (error) {
-			setErrorMessage(`Error loading reservation requests: ${error.message}`)
+			setErrorMessage(
+				`Error loading reservation requests: ${error.message}`,
+			)
 		} finally {
 			setLoading(false)
 		}
@@ -163,8 +187,8 @@ export default function ReservationRequestsPage() {
 	function handleReviewChange(event) {
 		const { name, value } = event.target
 
-		setReviewForm(prev => ({
-			...prev,
+		setReviewForm(previousReviewForm => ({
+			...previousReviewForm,
 			[name]: value,
 		}))
 	}
@@ -172,26 +196,44 @@ export default function ReservationRequestsPage() {
 	async function handleSaveReview(event) {
 		event.preventDefault()
 
-		if (!selectedRequest) return
+		if (!selectedRequest) {
+			return
+		}
 
 		try {
 			setSaving(true)
 			clearMessages()
 
-			const updatedRequest = await updateReservationRequest(selectedRequest.id, {
-				status: reviewForm.status,
-				admin_notes: reviewForm.admin_notes.trim() || null,
-			})
+			const updatedRequest =
+				await updateReservationRequest(
+					selectedRequest.id,
+					{
+						status: reviewForm.status,
+						admin_notes:
+							reviewForm.admin_notes.trim() ||
+							null,
+					},
+				)
 
-			setRequests(prev =>
-				sortRequests(prev.map(item => (item.id === selectedRequest.id ? updatedRequest : item))),
+			setRequests(previousRequests =>
+				sortRequests(
+					previousRequests.map(request =>
+						request.id === selectedRequest.id
+							? updatedRequest
+							: request,
+					),
+				),
 			)
 
 			await refreshCounts()
 
-			setSuccessMessage('Reservation request updated successfully.')
+			setSuccessMessage(
+				'Reservation request updated successfully.',
+			)
 		} catch (error) {
-			setErrorMessage(`Error updating reservation request: ${error.message}`)
+			setErrorMessage(
+				`Error updating reservation request: ${error.message}`,
+			)
 		} finally {
 			setSaving(false)
 		}
@@ -201,24 +243,35 @@ export default function ReservationRequestsPage() {
 		<section className='admin-page reservation-requests-page'>
 			<div className='admin-page__header'>
 				<h1>Reservation Requests</h1>
-				<p>Review customer reservation requests and update their status.</p>
+				<p>
+					Review customer reservation requests and update
+					their status.
+				</p>
 			</div>
 
 			<div className='admin-card'>
 				<div className='reservation-requests-page__filter-row'>
 					<div>
 						<h2>Incoming Requests</h2>
-						<p>Filter by status and select a request to review.</p>
+						<p>
+							Filter by status and select a request to
+							review.
+						</p>
 					</div>
 
 					<div className='form-group reservation-requests-page__filter'>
-						<label htmlFor='reservation-status-filter'>Status Filter</label>
+						<label htmlFor='reservation-status-filter'>
+							Status Filter
+						</label>
+
 						<select
 							id='reservation-status-filter'
 							value={statusFilter}
 							onChange={handleFilterChange}
+							disabled={loading || saving}
 						>
 							<option value=''>All</option>
+
 							{STATUS_OPTIONS.map(status => (
 								<option key={status} value={status}>
 									{formatStatusLabel(status)}
@@ -228,8 +281,17 @@ export default function ReservationRequestsPage() {
 					</div>
 				</div>
 
-				{successMessage && <p className='status-message status-message--success'>{successMessage}</p>}
-				{errorMessage && <p className='status-message status-message--error'>{errorMessage}</p>}
+				{successMessage && (
+					<p className='status-message status-message--success'>
+						{successMessage}
+					</p>
+				)}
+
+				{errorMessage && (
+					<p className='status-message status-message--error'>
+						{errorMessage}
+					</p>
+				)}
 
 				{loading ? (
 					<p>Loading reservation requests...</p>
@@ -250,8 +312,14 @@ export default function ReservationRequestsPage() {
 									<h3>{request.customer_name}</h3>
 
 									<div className='reservation-request-item__badges'>
-										<span className={getStatusBadgeClass(request.status)}>
-											{formatStatusLabel(request.status)}
+										<span
+											className={getStatusBadgeClass(
+												request.status,
+											)}
+										>
+											{formatStatusLabel(
+												request.status,
+											)}
 										</span>
 
 										{request.package_type && (
@@ -267,29 +335,49 @@ export default function ReservationRequestsPage() {
 													: 'reservation-request-item__badge--plain'
 											}`}
 										>
-											{hasAddOns(request) ? 'Add-ons Requested' : 'No Add-ons'}
+											{hasAddOns(request)
+												? 'Add-ons Requested'
+												: 'No Add-ons'}
 										</span>
 									</div>
 
 									<p>
-										<strong>Date:</strong> {formatDate(request.event_date)}
+										<strong>Date:</strong>{' '}
+										{formatReservationDate(
+											request.event_date,
+										)}
 									</p>
+
 									<p>
-										<strong>Time:</strong> {formatTime(request.start_time)} -{' '}
-										{formatTime(request.end_time)}
+										<strong>Time:</strong>{' '}
+										{formatReservationTimeRange(
+											request.start_time,
+											request.end_time,
+										)}
 									</p>
+
 									<p>
-										<strong>Status:</strong> {formatStatusLabel(request.status)}
+										<strong>Status:</strong>{' '}
+										{formatStatusLabel(
+											request.status,
+										)}
 									</p>
+
 									<p>
-										<strong>Package:</strong> {request.package_type || 'Not selected'}
+										<strong>Package:</strong>{' '}
+										{request.package_type ||
+											'Not selected'}
 									</p>
+
 									<p>
-										<strong>Add-ons:</strong> {buildAddOnSummary(request)}
+										<strong>Add-ons:</strong>{' '}
+										{buildAddOnSummary(request)}
 									</p>
+
 									{request.event_type && (
 										<p>
-											<strong>Type:</strong> {request.event_type}
+											<strong>Type:</strong>{' '}
+											{request.event_type}
 										</p>
 									)}
 								</div>
@@ -298,9 +386,17 @@ export default function ReservationRequestsPage() {
 									<button
 										type='button'
 										className='secondary-button'
-										onClick={() => handleSelectRequest(request)}
+										onClick={() =>
+											handleSelectRequest(
+												request,
+											)
+										}
+										disabled={saving}
 									>
-										{selectedRequestId === request.id ? 'Selected' : 'Review'}
+										{selectedRequestId ===
+										request.id
+											? 'Selected'
+											: 'Review'}
 									</button>
 								</div>
 							</article>
@@ -313,52 +409,137 @@ export default function ReservationRequestsPage() {
 				<h2>Request Review</h2>
 
 				{!selectedRequest ? (
-					<p>Select a reservation request to review its details.</p>
+					<p>
+						Select a reservation request to review its
+						details.
+					</p>
 				) : (
 					<div className='reservation-request-review'>
 						<div className='reservation-request-review__details'>
 							<h3>{selectedRequest.customer_name}</h3>
 
 							<div className='reservation-request-review__detail-grid'>
-								<p><strong>Phone:</strong> {selectedRequest.phone}</p>
-								<p><strong>Email:</strong> {selectedRequest.email}</p>
-								<p><strong>Event Date:</strong> {formatDate(selectedRequest.event_date)}</p>
-								<p><strong>Event Time:</strong> {formatTime(selectedRequest.start_time)} - {formatTime(selectedRequest.end_time)}</p>
-								<p><strong>Guest Count:</strong> {selectedRequest.guest_count ?? 'Not provided'}</p>
-								<p><strong>Package:</strong> {selectedRequest.package_type || 'Not provided'}</p>
-								<p><strong>Extra Lanes:</strong> {selectedRequest.extra_lanes ?? 0}</p>
-								<p><strong>Extra Pizzas:</strong> {selectedRequest.extra_pizzas ?? 0}</p>
-								<p><strong>Extra Pitchers:</strong> {selectedRequest.extra_pitchers ?? 0}</p>
-								<p><strong>Event Type:</strong> {selectedRequest.event_type || 'Not provided'}</p>
-								<p><strong>Submitted:</strong> {selectedRequest.created_at ? new Date(selectedRequest.created_at).toLocaleString() : 'Unknown'}</p>
-								<p><strong>Current Status:</strong> {formatStatusLabel(selectedRequest.status)}</p>
+								<p>
+									<strong>Phone:</strong>{' '}
+									{selectedRequest.phone ||
+										'Not provided'}
+								</p>
+
+								<p>
+									<strong>Email:</strong>{' '}
+									{selectedRequest.email ||
+										'Not provided'}
+								</p>
+
+								<p>
+									<strong>Event Date:</strong>{' '}
+									{formatReservationDate(
+										selectedRequest.event_date,
+									)}
+								</p>
+
+								<p>
+									<strong>Event Time:</strong>{' '}
+									{formatReservationTimeRange(
+										selectedRequest.start_time,
+										selectedRequest.end_time,
+									)}
+								</p>
+
+								<p>
+									<strong>Guest Count:</strong>{' '}
+									{selectedRequest.guest_count ??
+										'Not provided'}
+								</p>
+
+								<p>
+									<strong>Package:</strong>{' '}
+									{selectedRequest.package_type ||
+										'Not provided'}
+								</p>
+
+								<p>
+									<strong>Extra Lanes:</strong>{' '}
+									{selectedRequest.extra_lanes ?? 0}
+								</p>
+
+								<p>
+									<strong>Extra Pizzas:</strong>{' '}
+									{selectedRequest.extra_pizzas ??
+										0}
+								</p>
+
+								<p>
+									<strong>Extra Pitchers:</strong>{' '}
+									{selectedRequest.extra_pitchers ??
+										0}
+								</p>
+
+								<p>
+									<strong>Event Type:</strong>{' '}
+									{selectedRequest.event_type ||
+										'Not provided'}
+								</p>
+
+								<p>
+									<strong>Submitted:</strong>{' '}
+									{formatDateTime(
+										selectedRequest.created_at,
+									)}
+								</p>
+
+								<p>
+									<strong>Current Status:</strong>{' '}
+									{formatStatusLabel(
+										selectedRequest.status,
+									)}
+								</p>
 							</div>
 
 							<div className='reservation-request-review__notes'>
 								<h4>Customer Notes</h4>
-								<p>{selectedRequest.notes || 'No customer notes were provided.'}</p>
+
+								<p>
+									{selectedRequest.notes ||
+										'No customer notes were provided.'}
+								</p>
 							</div>
 						</div>
 
-						<form className='reservation-request-review__form' onSubmit={handleSaveReview}>
+						<form
+							className='reservation-request-review__form'
+							onSubmit={handleSaveReview}
+						>
 							<div className='form-group'>
-								<label htmlFor='review-status'>Status</label>
+								<label htmlFor='review-status'>
+									Status
+								</label>
+
 								<select
 									id='review-status'
 									name='status'
 									value={reviewForm.status}
 									onChange={handleReviewChange}
+									disabled={saving}
 								>
 									{STATUS_OPTIONS.map(status => (
-										<option key={status} value={status}>
-											{formatStatusLabel(status)}
+										<option
+											key={status}
+											value={status}
+										>
+											{formatStatusLabel(
+												status,
+											)}
 										</option>
 									))}
 								</select>
 							</div>
 
 							<div className='form-group'>
-								<label htmlFor='admin_notes'>Admin Notes</label>
+								<label htmlFor='admin_notes'>
+									Admin Notes
+								</label>
+
 								<textarea
 									id='admin_notes'
 									name='admin_notes'
@@ -366,12 +547,18 @@ export default function ReservationRequestsPage() {
 									value={reviewForm.admin_notes}
 									onChange={handleReviewChange}
 									placeholder='Internal notes about this request'
+									disabled={saving}
 								/>
 							</div>
 
 							<div className='form-actions'>
-								<button type='submit' disabled={saving}>
-									{saving ? 'Saving...' : 'Save Review'}
+								<button
+									type='submit'
+									disabled={saving}
+								>
+									{saving
+										? 'Saving...'
+										: 'Save Review'}
 								</button>
 							</div>
 						</form>

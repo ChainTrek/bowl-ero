@@ -32,13 +32,6 @@ export default function AdminLayout() {
 		}
 	}
 
-	function markApplicationCountReviewed() {
-		setCounts(prev => ({
-			...prev,
-			applications: Math.max(0, prev.applications - 1),
-		}))
-	}
-
 	async function handleLogout() {
 		try {
 			await logout()
@@ -70,7 +63,7 @@ export default function AdminLayout() {
 					</button>
 				</div>
 
-				<Outlet context={{ refreshCounts, markApplicationCountReviewed }} />
+				<Outlet context={{ refreshCounts }} />
 			</main>
 		</div>
 	)
