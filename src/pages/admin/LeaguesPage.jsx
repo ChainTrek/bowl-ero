@@ -1,264 +1,383 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 import {
-  getLeagues,
-  createLeague,
-  updateLeague,
-  toggleLeagueActive,
-} from '../../services/supabase/leagues';
+	getLeagues,
+	createLeague,
+	updateLeague,
+	toggleLeagueActive,
+} from '../../services/supabase/leagues'
 
 const initialForm = {
-  name: '',
-  day_of_week: '',
-  is_active: true,
-};
+	name: '',
+	day_of_week: '',
+	is_active: true,
+}
 
 export default function LeaguesPage() {
-  const [leagues, setLeagues] = useState([]);
-  const [formData, setFormData] = useState(initialForm);
-  const [editingLeagueId, setEditingLeagueId] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [statusMessage, setStatusMessage] = useState('');
+	const [leagues, setLeagues] = useState([])
+	const [formData, setFormData] = useState(initialForm)
+	const [editingLeagueId, setEditingLeagueId] = useState(null)
+	const [loading, setLoading] = useState(true)
+	const [submitting, setSubmitting] = useState(false)
+	const [statusMessage, setStatusMessage] = useState('')
 
-  async function loadLeagues() {
-    try {
-      setLoading(true);
-      const data = await getLeagues();
-      setLeagues(data);
-    } catch (error) {
-      setStatusMessage(`Error loading leagues: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  }
+	useEffect(() => {
+		let isMounted = true
 
-  useEffect(() => {
-    loadLeagues();
-  }, []);
+		async function loadLeagues() {
+			try {
+				const data = await getLeagues()
 
-  function handleChange(event) {
-    const { name, value, type, checked } = event.target;
+				if (isMounted) {
+					setLeagues(data)
+				}
+			} catch (error) {
+				if (isMounted) {
+					setStatusMessage(
+						`Error loading leagues: ${error.message}`,
+					)
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false)
+				}
+			}
+		}
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  }
+		loadLeagues()
 
-  function handleEditClick(league) {
-    setEditingLeagueId(league.id);
-    setFormData({
-      name: league.name || '',
-      day_of_week: league.day_of_week || '',
-      is_active: league.is_active,
-    });
-    setStatusMessage('');
-  }
+		return () => {
+			isMounted = false
+		}
+	}, [])
 
-  function handleCancelEdit() {
-    setEditingLeagueId(null);
-    setFormData(initialForm);
-    setStatusMessage('');
-  }
+	function handleChange(event) {
+		const { name, value, type, checked } = event.target
 
-  async function handleSubmit(event) {
-    event.preventDefault();
+		setFormData(previousFormData => ({
+			...previousFormData,
+			[name]: type === 'checkbox' ? checked : value,
+		}))
+	}
 
-    if (!formData.name.trim()) {
-      setStatusMessage('League name is required.');
-      return;
-    }
+	function handleEditClick(league) {
+		setEditingLeagueId(league.id)
 
-    const payload = {
-      name: formData.name.trim(),
-      day_of_week: formData.day_of_week || null,
-      is_active: formData.is_active,
-    };
+		setFormData({
+			name: league.name || '',
+			day_of_week: league.day_of_week || '',
+			is_active: league.is_active,
+		})
 
-    try {
-      setSubmitting(true);
-      setStatusMessage('');
+		setStatusMessage('')
+	}
 
-      if (editingLeagueId) {
-        const updatedLeague = await updateLeague(editingLeagueId, payload);
+	function handleCancelEdit() {
+		setEditingLeagueId(null)
+		setFormData(initialForm)
+		setStatusMessage('')
+	}
 
-        setLeagues((prev) =>
-          prev.map((league) =>
-            league.id === editingLeagueId ? updatedLeague : league
-          )
-        );
+	async function handleSubmit(event) {
+		event.preventDefault()
 
-        setStatusMessage('League updated successfully.');
-      } else {
-        const newLeague = await createLeague(payload);
-        setLeagues((prev) => [newLeague, ...prev]);
-        setStatusMessage('League added successfully.');
-      }
+		if (!formData.name.trim()) {
+			setStatusMessage('League name is required.')
+			return
+		}
 
-      setFormData(initialForm);
-      setEditingLeagueId(null);
-    } catch (error) {
-      setStatusMessage(
-        `Error ${editingLeagueId ? 'updating' : 'adding'} league: ${error.message}`
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  }
+		const payload = {
+			name: formData.name.trim(),
+			day_of_week: formData.day_of_week || null,
+			is_active: formData.is_active,
+		}
 
-  async function handleToggleActive(league) {
-    const actionLabel = league.is_active ? 'deactivate' : 'reactivate';
-    const confirmed = window.confirm(
-      `Are you sure you want to ${actionLabel} "${league.name}"?`
-    );
+		try {
+			setSubmitting(true)
+			setStatusMessage('')
 
-    if (!confirmed) return;
+			if (editingLeagueId) {
+				const updatedLeague = await updateLeague(
+					editingLeagueId,
+					payload,
+				)
 
-    try {
-      const updatedLeague = await toggleLeagueActive(league.id, league.is_active);
+				setLeagues(previousLeagues =>
+					previousLeagues.map(league =>
+						league.id === editingLeagueId
+							? updatedLeague
+							: league,
+					),
+				)
 
-      setLeagues((prev) =>
-        prev.map((item) => (item.id === league.id ? updatedLeague : item))
-      );
+				setStatusMessage(
+					'League updated successfully.',
+				)
+			} else {
+				const newLeague = await createLeague(payload)
 
-      if (editingLeagueId === league.id) {
-        setFormData((prev) => ({
-          ...prev,
-          is_active: updatedLeague.is_active,
-        }));
-      }
+				setLeagues(previousLeagues => [
+					newLeague,
+					...previousLeagues,
+				])
 
-      setStatusMessage(
-        `League ${updatedLeague.is_active ? 'reactivated' : 'deactivated'} successfully.`
-      );
-    } catch (error) {
-      setStatusMessage(`Error changing league status: ${error.message}`);
-    }
-  }
+				setStatusMessage(
+					'League added successfully.',
+				)
+			}
 
-  return (
-    <section className="admin-page leagues-page">
-      <div className="admin-page__header">
-        <h1>Leagues</h1>
-        <p>Add, edit, and activate/deactivate league names.</p>
-      </div>
+			setFormData(initialForm)
+			setEditingLeagueId(null)
+		} catch (error) {
+			setStatusMessage(
+				`Error ${
+					editingLeagueId ? 'updating' : 'adding'
+				} league: ${error.message}`,
+			)
+		} finally {
+			setSubmitting(false)
+		}
+	}
 
-      <div className="admin-card">
-        <h2>{editingLeagueId ? 'Edit League' : 'Add League'}</h2>
+	async function handleToggleActive(league) {
+		const actionLabel = league.is_active
+			? 'deactivate'
+			: 'reactivate'
 
-        <form className="league-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="name">League Name</label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Enter league name"
-            />
-          </div>
+		const confirmed = window.confirm(
+			`Are you sure you want to ${actionLabel} "${league.name}"?`,
+		)
 
-          <div className="form-group">
-            <label htmlFor="day_of_week">Day of Week</label>
-            <select
-              id="day_of_week"
-              name="day_of_week"
-              value={formData.day_of_week}
-              onChange={handleChange}
-            >
-              <option value="">Select a day</option>
-              <option value="Monday">Monday</option>
-              <option value="Tuesday">Tuesday</option>
-              <option value="Wednesday">Wednesday</option>
-              <option value="Thursday">Thursday</option>
-              <option value="Friday">Friday</option>
-              <option value="Saturday">Saturday</option>
-              <option value="Sunday">Sunday</option>
-            </select>
-          </div>
+		if (!confirmed) {
+			return
+		}
 
-          <div className="form-checkbox">
-            <label htmlFor="is_active">
-              <input
-                id="is_active"
-                name="is_active"
-                type="checkbox"
-                checked={formData.is_active}
-                onChange={handleChange}
-              />
-              Active
-            </label>
-          </div>
+		try {
+			setStatusMessage('')
 
-          <div className="form-actions">
-            <button type="submit" disabled={submitting}>
-              {submitting
-                ? 'Saving...'
-                : editingLeagueId
-                ? 'Update League'
-                : 'Add League'}
-            </button>
+			const updatedLeague = await toggleLeagueActive(
+				league.id,
+				league.is_active,
+			)
 
-            {editingLeagueId && (
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={handleCancelEdit}
-              >
-                Cancel Edit
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
+			setLeagues(previousLeagues =>
+				previousLeagues.map(item =>
+					item.id === league.id
+						? updatedLeague
+						: item,
+				),
+			)
 
-      <div className="admin-card">
-        <h2>Current Leagues</h2>
+			if (editingLeagueId === league.id) {
+				setFormData(previousFormData => ({
+					...previousFormData,
+					is_active: updatedLeague.is_active,
+				}))
+			}
 
-        {statusMessage && <p className="status-message">{statusMessage}</p>}
+			setStatusMessage(
+				`League ${
+					updatedLeague.is_active
+						? 'reactivated'
+						: 'deactivated'
+				} successfully.`,
+			)
+		} catch (error) {
+			setStatusMessage(
+				`Error changing league status: ${error.message}`,
+			)
+		}
+	}
 
-        {loading ? (
-          <p>Loading leagues...</p>
-        ) : leagues.length === 0 ? (
-          <p>No leagues found.</p>
-        ) : (
-          <div className="league-list">
-            {leagues.map((league) => (
-              <article
-                className={`league-item ${!league.is_active ? 'league-item--inactive' : ''}`}
-                key={league.id}
-              >
-                <div className="league-item__info">
-                  <h3>{league.name}</h3>
-                  <p>
-                    Day: {league.day_of_week || 'Not set'} | Status:{' '}
-                    {league.is_active ? 'Active' : 'Inactive'}
-                  </p>
-                </div>
+	return (
+		<section className='admin-page leagues-page'>
+			<div className='admin-page__header'>
+				<h1>Leagues</h1>
 
-                <div className="league-item__actions">
-                  <button
-                    type="button"
-                    className="edit-button"
-                    onClick={() => handleEditClick(league)}
-                  >
-                    Edit
-                  </button>
+				<p>
+					Add, edit, and activate/deactivate league names.
+				</p>
+			</div>
 
-                  <button
-                    type="button"
-                    className={league.is_active ? 'warning-button' : 'success-button'}
-                    onClick={() => handleToggleActive(league)}
-                  >
-                    {league.is_active ? 'Deactivate' : 'Reactivate'}
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
-  );
+			<div className='admin-card'>
+				<h2>
+					{editingLeagueId
+						? 'Edit League'
+						: 'Add League'}
+				</h2>
+
+				<form
+					className='league-form'
+					onSubmit={handleSubmit}
+				>
+					<div className='form-group'>
+						<label htmlFor='name'>
+							League Name
+						</label>
+
+						<input
+							id='name'
+							name='name'
+							type='text'
+							value={formData.name}
+							onChange={handleChange}
+							placeholder='Enter league name'
+							disabled={submitting}
+						/>
+					</div>
+
+					<div className='form-group'>
+						<label htmlFor='day_of_week'>
+							Day of Week
+						</label>
+
+						<select
+							id='day_of_week'
+							name='day_of_week'
+							value={formData.day_of_week}
+							onChange={handleChange}
+							disabled={submitting}
+						>
+							<option value=''>
+								Select a day
+							</option>
+							<option value='Monday'>
+								Monday
+							</option>
+							<option value='Tuesday'>
+								Tuesday
+							</option>
+							<option value='Wednesday'>
+								Wednesday
+							</option>
+							<option value='Thursday'>
+								Thursday
+							</option>
+							<option value='Friday'>
+								Friday
+							</option>
+							<option value='Saturday'>
+								Saturday
+							</option>
+							<option value='Sunday'>
+								Sunday
+							</option>
+						</select>
+					</div>
+
+					<div className='form-checkbox'>
+						<label htmlFor='is_active'>
+							<input
+								id='is_active'
+								name='is_active'
+								type='checkbox'
+								checked={formData.is_active}
+								onChange={handleChange}
+								disabled={submitting}
+							/>
+							Active
+						</label>
+					</div>
+
+					<div className='form-actions'>
+						<button
+							type='submit'
+							disabled={submitting}
+						>
+							{submitting
+								? 'Saving...'
+								: editingLeagueId
+									? 'Update League'
+									: 'Add League'}
+						</button>
+
+						{editingLeagueId && (
+							<button
+								type='button'
+								className='secondary-button'
+								onClick={handleCancelEdit}
+								disabled={submitting}
+							>
+								Cancel Edit
+							</button>
+						)}
+					</div>
+				</form>
+			</div>
+
+			<div className='admin-card'>
+				<h2>Current Leagues</h2>
+
+				{statusMessage && (
+					<p className='status-message'>
+						{statusMessage}
+					</p>
+				)}
+
+				{loading ? (
+					<p>Loading leagues...</p>
+				) : leagues.length === 0 ? (
+					<p>No leagues found.</p>
+				) : (
+					<div className='league-list'>
+						{leagues.map(league => (
+							<article
+								className={`league-item ${
+									!league.is_active
+										? 'league-item--inactive'
+										: ''
+								}`}
+								key={league.id}
+							>
+								<div className='league-item__info'>
+									<h3>{league.name}</h3>
+
+									<p>
+										Day:{' '}
+										{league.day_of_week ||
+											'Not set'}{' '}
+										| Status:{' '}
+										{league.is_active
+											? 'Active'
+											: 'Inactive'}
+									</p>
+								</div>
+
+								<div className='league-item__actions'>
+									<button
+										type='button'
+										className='edit-button'
+										onClick={() =>
+											handleEditClick(
+												league,
+											)
+										}
+									>
+										Edit
+									</button>
+
+									<button
+										type='button'
+										className={
+											league.is_active
+												? 'warning-button'
+												: 'success-button'
+										}
+										onClick={() =>
+											handleToggleActive(
+												league,
+											)
+										}
+									>
+										{league.is_active
+											? 'Deactivate'
+											: 'Reactivate'}
+									</button>
+								</div>
+							</article>
+						))}
+					</div>
+				)}
+			</div>
+		</section>
+	)
 }

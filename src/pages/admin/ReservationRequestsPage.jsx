@@ -123,50 +123,49 @@ export default function ReservationRequestsPage() {
 	)
 
 	useEffect(() => {
-		loadRequests(statusFilter)
+		let isMounted = true
+
+		async function loadRequests() {
+			try {
+				const data =
+					await getReservationRequests(statusFilter)
+
+				const sortedRequests = sortRequests(data)
+
+				if (!isMounted) {
+					return
+				}
+
+				setRequests(sortedRequests)
+
+				const firstRequest = sortedRequests[0] || null
+
+				setSelectedRequestId(firstRequest?.id ?? null)
+
+				setReviewForm({
+					status: firstRequest?.status || 'pending',
+					admin_notes:
+						firstRequest?.admin_notes || '',
+				})
+			} catch (error) {
+				if (isMounted) {
+					setErrorMessage(
+						`Error loading reservation requests: ${error.message}`,
+					)
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false)
+				}
+			}
+		}
+
+		loadRequests()
+
+		return () => {
+			isMounted = false
+		}
 	}, [statusFilter])
-
-	useEffect(() => {
-		if (!selectedRequest) {
-			return
-		}
-
-		setReviewForm({
-			status: selectedRequest.status || 'pending',
-			admin_notes: selectedRequest.admin_notes || '',
-		})
-	}, [selectedRequest])
-
-	async function loadRequests(status = '') {
-		try {
-			setLoading(true)
-			setErrorMessage('')
-
-			const data = await getReservationRequests(status)
-			const sortedRequests = sortRequests(data)
-
-			setRequests(sortedRequests)
-
-			if (sortedRequests.length === 0) {
-				setSelectedRequestId(null)
-				return
-			}
-
-			const selectedStillExists = sortedRequests.some(
-				request => request.id === selectedRequestId,
-			)
-
-			if (!selectedStillExists) {
-				setSelectedRequestId(sortedRequests[0].id)
-			}
-		} catch (error) {
-			setErrorMessage(
-				`Error loading reservation requests: ${error.message}`,
-			)
-		} finally {
-			setLoading(false)
-		}
-	}
 
 	function clearMessages() {
 		setErrorMessage('')
@@ -174,13 +173,26 @@ export default function ReservationRequestsPage() {
 	}
 
 	function handleFilterChange(event) {
+		setLoading(true)
 		setStatusFilter(event.target.value)
 		setSelectedRequestId(null)
+
+		setReviewForm({
+			status: 'pending',
+			admin_notes: '',
+		})
+
 		clearMessages()
 	}
 
 	function handleSelectRequest(request) {
 		setSelectedRequestId(request.id)
+
+		setReviewForm({
+			status: request.status || 'pending',
+			admin_notes: request.admin_notes || '',
+		})
+
 		clearMessages()
 	}
 
@@ -225,6 +237,12 @@ export default function ReservationRequestsPage() {
 				),
 			)
 
+			setReviewForm({
+				status: updatedRequest.status || 'pending',
+				admin_notes:
+					updatedRequest.admin_notes || '',
+			})
+
 			await refreshCounts()
 
 			setSuccessMessage(
@@ -243,6 +261,7 @@ export default function ReservationRequestsPage() {
 		<section className='admin-page reservation-requests-page'>
 			<div className='admin-page__header'>
 				<h1>Reservation Requests</h1>
+
 				<p>
 					Review customer reservation requests and update
 					their status.
@@ -253,6 +272,7 @@ export default function ReservationRequestsPage() {
 				<div className='reservation-requests-page__filter-row'>
 					<div>
 						<h2>Incoming Requests</h2>
+
 						<p>
 							Filter by status and select a request to
 							review.

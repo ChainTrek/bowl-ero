@@ -17,28 +17,43 @@ export default function EmploymentApplicationsPage() {
 	const [statusMessage, setStatusMessage] = useState('')
 
 	useEffect(() => {
-		loadApplications()
-	}, [])
+		let isMounted = true
 
-	async function loadApplications() {
-		try {
-			setLoading(true)
-			setStatusMessage('')
+		async function loadApplications() {
+			try {
+				const data = await getEmploymentApplications()
 
-			const data = await getEmploymentApplications()
-			setApplications(data)
-		} catch (error) {
-			setStatusMessage(`Error loading applications: ${error.message}`)
-		} finally {
-			setLoading(false)
+				if (isMounted) {
+					setApplications(data)
+				}
+			} catch (error) {
+				if (isMounted) {
+					setStatusMessage(
+						`Error loading applications: ${error.message}`,
+					)
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false)
+				}
+			}
 		}
-	}
+
+		loadApplications()
+
+		return () => {
+			isMounted = false
+		}
+	}, [])
 
 	return (
 		<section className='admin-page employment-applications-page'>
 			<div className='admin-page__header'>
 				<h1>Employment Applications</h1>
-				<p>Review submitted job applications from the public site.</p>
+				<p>
+					Review submitted job applications from the public
+					site.
+				</p>
 			</div>
 
 			<div className='admin-card'>
@@ -64,7 +79,8 @@ export default function EmploymentApplicationsPage() {
 								<div className='employment-application-item__header'>
 									<div>
 										<h3>
-											{application.first_name} {application.last_name}
+											{application.first_name}{' '}
+											{application.last_name}
 										</h3>
 
 										<div className='employment-application-item__badges'>
@@ -80,20 +96,26 @@ export default function EmploymentApplicationsPage() {
 
 											{application.position_desired && (
 												<span className='employment-application-badge employment-application-badge--position'>
-													{application.position_desired}
+													{
+														application.position_desired
+													}
 												</span>
 											)}
 
 											{application.employment_type && (
 												<span className='employment-application-badge employment-application-badge--type'>
-													{application.employment_type}
+													{
+														application.employment_type
+													}
 												</span>
 											)}
 										</div>
 
 										<p>
 											Submitted:{' '}
-											{formatDateTime(application.created_at)}
+											{formatDateTime(
+												application.created_at,
+											)}
 										</p>
 
 										{application.reviewed &&

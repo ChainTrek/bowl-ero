@@ -1,13 +1,19 @@
 import { useEffect, useMemo, useState } from 'react'
-import { getHours, updateHoursRow, updateMultipleHoursRows } from '../../services/supabase/hours'
+import {
+	getHours,
+	updateHoursRow,
+	updateMultipleHoursRows,
+} from '../../services/supabase/hours'
 
-function rowsAreEqual(a, b) {
+function rowsAreEqual(firstRow, secondRow) {
 	return (
-		a.day_of_week === b.day_of_week &&
-		(a.open_time || '') === (b.open_time || '') &&
-		(a.close_time || '') === (b.close_time || '') &&
-		a.is_closed === b.is_closed &&
-		a.display_order === b.display_order
+		firstRow.day_of_week === secondRow.day_of_week &&
+		(firstRow.open_time || '') ===
+			(secondRow.open_time || '') &&
+		(firstRow.close_time || '') ===
+			(secondRow.close_time || '') &&
+		firstRow.is_closed === secondRow.is_closed &&
+		firstRow.display_order === secondRow.display_order
 	)
 }
 
@@ -20,35 +26,64 @@ export default function HoursPage() {
 	const [statusMessage, setStatusMessage] = useState('')
 
 	useEffect(() => {
-		loadHours()
-	}, [])
+		let isMounted = true
 
-	async function loadHours() {
-		try {
-			setLoading(true)
-			const data = await getHours()
-			setHours(data)
-			setOriginalHours(data)
-		} catch (error) {
-			setStatusMessage(`Error loading hours: ${error.message}`)
-		} finally {
-			setLoading(false)
+		async function loadHours() {
+			try {
+				const data = await getHours()
+
+				if (isMounted) {
+					setHours(data)
+					setOriginalHours(data)
+				}
+			} catch (error) {
+				if (isMounted) {
+					setStatusMessage(
+						`Error loading hours: ${error.message}`,
+					)
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false)
+				}
+			}
 		}
-	}
 
-	function handleChange(id, field, value) {
-		setHours(prev => prev.map(row => (row.id === id ? { ...row, [field]: value } : row)))
-	}
+		loadHours()
+
+		return () => {
+			isMounted = false
+		}
+	}, [])
 
 	const changedRows = useMemo(() => {
 		return hours.filter(row => {
-			const originalRow = originalHours.find(item => item.id === row.id)
-			if (!originalRow) return false
+			const originalRow = originalHours.find(
+				item => item.id === row.id,
+			)
+
+			if (!originalRow) {
+				return false
+			}
+
 			return !rowsAreEqual(row, originalRow)
 		})
 	}, [hours, originalHours])
 
 	const hasUnsavedChanges = changedRows.length > 0
+
+	function handleChange(id, field, value) {
+		setHours(previousHours =>
+			previousHours.map(row =>
+				row.id === id
+					? {
+							...row,
+							[field]: value,
+						}
+					: row,
+			),
+		)
+	}
 
 	async function handleSave(row) {
 		try {
@@ -57,19 +92,35 @@ export default function HoursPage() {
 
 			const updatedRow = await updateHoursRow(row.id, {
 				day_of_week: row.day_of_week,
-				open_time: row.is_closed ? null : row.open_time || null,
-				close_time: row.is_closed ? null : row.close_time || null,
+				open_time: row.is_closed
+					? null
+					: row.open_time || null,
+				close_time: row.is_closed
+					? null
+					: row.close_time || null,
 				is_closed: row.is_closed,
 				display_order: row.display_order,
 			})
 
-			setHours(prev => prev.map(item => (item.id === row.id ? updatedRow : item)))
+			setHours(previousHours =>
+				previousHours.map(item =>
+					item.id === row.id ? updatedRow : item,
+				),
+			)
 
-			setOriginalHours(prev => prev.map(item => (item.id === row.id ? updatedRow : item)))
+			setOriginalHours(previousHours =>
+				previousHours.map(item =>
+					item.id === row.id ? updatedRow : item,
+				),
+			)
 
-			setStatusMessage(`${row.day_of_week} updated successfully.`)
+			setStatusMessage(
+				`${row.day_of_week} updated successfully.`,
+			)
 		} catch (error) {
-			setStatusMessage(`Error saving hours: ${error.message}`)
+			setStatusMessage(
+				`Error saving hours: ${error.message}`,
+			)
 		} finally {
 			setSavingRowId(null)
 		}
@@ -85,25 +136,36 @@ export default function HoursPage() {
 			setSavingAll(true)
 			setStatusMessage('')
 
-			const updatedRows = await updateMultipleHoursRows(changedRows)
+			const updatedRows =
+				await updateMultipleHoursRows(changedRows)
 
-			setHours(prev =>
-				prev.map(row => {
-					const updated = updatedRows.find(item => item.id === row.id)
-					return updated || row
+			setHours(previousHours =>
+				previousHours.map(row => {
+					const updatedRow = updatedRows.find(
+						item => item.id === row.id,
+					)
+
+					return updatedRow || row
 				}),
 			)
 
-			setOriginalHours(prev =>
-				prev.map(row => {
-					const updated = updatedRows.find(item => item.id === row.id)
-					return updated || row
+			setOriginalHours(previousHours =>
+				previousHours.map(row => {
+					const updatedRow = updatedRows.find(
+						item => item.id === row.id,
+					)
+
+					return updatedRow || row
 				}),
 			)
 
-			setStatusMessage(`Saved ${updatedRows.length} day(s) successfully.`)
+			setStatusMessage(
+				`Saved ${updatedRows.length} day(s) successfully.`,
+			)
 		} catch (error) {
-			setStatusMessage(`Error saving all hours: ${error.message}`)
+			setStatusMessage(
+				`Error saving all hours: ${error.message}`,
+			)
 		} finally {
 			setSavingAll(false)
 		}
@@ -118,13 +180,16 @@ export default function HoursPage() {
 		<section className='admin-page hours-page'>
 			<div className='admin-page__header'>
 				<h1>Hours of Operation</h1>
-				<p>Update business hours without changing code.</p>
+				<p>
+					Update business hours without changing code.
+				</p>
 			</div>
 
 			<div className='admin-card'>
 				<div className='hours-toolbar'>
 					<div>
 						<h2>Weekly Hours</h2>
+
 						<p>
 							{hasUnsavedChanges
 								? `${changedRows.length} row(s) have unsaved changes.`
@@ -137,49 +202,83 @@ export default function HoursPage() {
 							type='button'
 							className='secondary-button'
 							onClick={handleResetChanges}
-							disabled={!hasUnsavedChanges || savingAll}
+							disabled={
+								!hasUnsavedChanges || savingAll
+							}
 						>
 							Reset Changes
 						</button>
 
-						<button type='button' onClick={handleSaveAll} disabled={!hasUnsavedChanges || savingAll}>
-							{savingAll ? 'Saving All...' : 'Save All'}
+						<button
+							type='button'
+							onClick={handleSaveAll}
+							disabled={
+								!hasUnsavedChanges || savingAll
+							}
+						>
+							{savingAll
+								? 'Saving All...'
+								: 'Save All'}
 						</button>
 					</div>
 				</div>
 
-				{statusMessage && <p className='status-message'>{statusMessage}</p>}
+				{statusMessage && (
+					<p className='status-message'>
+						{statusMessage}
+					</p>
+				)}
 
 				{loading ? (
 					<p>Loading hours...</p>
 				) : (
 					<div className='hours-list'>
 						{hours.map(row => {
-							const originalRow = originalHours.find(item => item.id === row.id)
-							const isDirty = originalRow ? !rowsAreEqual(row, originalRow) : false
+							const originalRow =
+								originalHours.find(
+									item => item.id === row.id,
+								)
+
+							const isDirty = originalRow
+								? !rowsAreEqual(row, originalRow)
+								: false
 
 							return (
 								<article
-									className={`hours-item ${isDirty ? 'hours-item--dirty' : ''}`}
+									className={`hours-item ${
+										isDirty
+											? 'hours-item--dirty'
+											: ''
+									}`}
 									key={row.id}
 								>
 									<div className='hours-item__day'>
 										<h3>{row.day_of_week}</h3>
-										{isDirty && <span className='dirty-badge'>Unsaved</span>}
+
+										{isDirty && (
+											<span className='dirty-badge'>
+												Unsaved
+											</span>
+										)}
 									</div>
 
 									<div className='hours-item__fields'>
 										<div className='form-checkbox'>
-											<label htmlFor={`closed-${row.id}`}>
+											<label
+												htmlFor={`closed-${row.id}`}
+											>
 												<input
 													id={`closed-${row.id}`}
 													type='checkbox'
-													checked={row.is_closed}
+													checked={
+														row.is_closed
+													}
 													onChange={event =>
 														handleChange(
 															row.id,
 															'is_closed',
-															event.target.checked,
+															event.target
+																.checked,
 														)
 													}
 												/>
@@ -188,28 +287,57 @@ export default function HoursPage() {
 										</div>
 
 										<div className='form-group'>
-											<label htmlFor={`open-${row.id}`}>Open</label>
+											<label
+												htmlFor={`open-${row.id}`}
+											>
+												Open
+											</label>
+
 											<input
 												id={`open-${row.id}`}
 												type='time'
-												value={row.open_time || ''}
-												onChange={event =>
-													handleChange(row.id, 'open_time', event.target.value)
+												value={
+													row.open_time || ''
 												}
-												disabled={row.is_closed}
+												onChange={event =>
+													handleChange(
+														row.id,
+														'open_time',
+														event.target
+															.value,
+													)
+												}
+												disabled={
+													row.is_closed
+												}
 											/>
 										</div>
 
 										<div className='form-group'>
-											<label htmlFor={`close-${row.id}`}>Close</label>
+											<label
+												htmlFor={`close-${row.id}`}
+											>
+												Close
+											</label>
+
 											<input
 												id={`close-${row.id}`}
 												type='time'
-												value={row.close_time || ''}
-												onChange={event =>
-													handleChange(row.id, 'close_time', event.target.value)
+												value={
+													row.close_time ||
+													''
 												}
-												disabled={row.is_closed}
+												onChange={event =>
+													handleChange(
+														row.id,
+														'close_time',
+														event.target
+															.value,
+													)
+												}
+												disabled={
+													row.is_closed
+												}
 											/>
 										</div>
 									</div>
@@ -217,10 +345,19 @@ export default function HoursPage() {
 									<div className='hours-item__actions'>
 										<button
 											type='button'
-											onClick={() => handleSave(row)}
-											disabled={savingRowId === row.id || savingAll || !isDirty}
+											onClick={() =>
+												handleSave(row)
+											}
+											disabled={
+												savingRowId ===
+													row.id ||
+												savingAll ||
+												!isDirty
+											}
 										>
-											{savingRowId === row.id ? 'Saving...' : 'Save Row'}
+											{savingRowId === row.id
+												? 'Saving...'
+												: 'Save Row'}
 										</button>
 									</div>
 								</article>

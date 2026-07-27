@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
 	getReservationBlockouts,
 	createReservationBlockout,
@@ -23,17 +23,17 @@ const initialForm = {
 
 function sortBlockouts(items) {
 	return [...items].sort((a, b) => {
-		const dateCompare = String(a.block_date || '').localeCompare(
-			String(b.block_date || ''),
-		)
+		const dateCompare = String(
+			a.block_date || '',
+		).localeCompare(String(b.block_date || ''))
 
 		if (dateCompare !== 0) {
 			return dateCompare
 		}
 
-		const startCompare = String(a.start_time || '').localeCompare(
-			String(b.start_time || ''),
-		)
+		const startCompare = String(
+			a.start_time || '',
+		).localeCompare(String(b.start_time || ''))
 
 		if (startCompare !== 0) {
 			return startCompare
@@ -48,37 +48,46 @@ function sortBlockouts(items) {
 export default function ReservationBlockoutsPage() {
 	const [blockouts, setBlockouts] = useState([])
 	const [formData, setFormData] = useState(initialForm)
-	const [editingBlockoutId, setEditingBlockoutId] = useState(null)
+	const [editingBlockoutId, setEditingBlockoutId] =
+		useState(null)
 	const [loading, setLoading] = useState(true)
 	const [saving, setSaving] = useState(false)
-	const [deletingBlockoutId, setDeletingBlockoutId] = useState(null)
+	const [deletingBlockoutId, setDeletingBlockoutId] =
+		useState(null)
 	const [errorMessage, setErrorMessage] = useState('')
 	const [successMessage, setSuccessMessage] = useState('')
 
-	const isEditing = useMemo(
-		() => Boolean(editingBlockoutId),
-		[editingBlockoutId],
-	)
+	const isEditing = Boolean(editingBlockoutId)
 
 	useEffect(() => {
-		loadBlockouts()
-	}, [])
+		let isMounted = true
 
-	async function loadBlockouts() {
-		try {
-			setLoading(true)
-			setErrorMessage('')
+		async function loadBlockouts() {
+			try {
+				const data = await getReservationBlockouts()
 
-			const data = await getReservationBlockouts()
-			setBlockouts(sortBlockouts(data))
-		} catch (error) {
-			setErrorMessage(
-				`Error loading reservation blockouts: ${error.message}`,
-			)
-		} finally {
-			setLoading(false)
+				if (isMounted) {
+					setBlockouts(sortBlockouts(data))
+				}
+			} catch (error) {
+				if (isMounted) {
+					setErrorMessage(
+						`Error loading reservation blockouts: ${error.message}`,
+					)
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false)
+				}
+			}
 		}
-	}
+
+		loadBlockouts()
+
+		return () => {
+			isMounted = false
+		}
+	}, [])
 
 	function resetForm() {
 		setFormData(initialForm)
@@ -161,7 +170,8 @@ export default function ReservationBlockoutsPage() {
 
 			const payload = {
 				title: formData.title.trim(),
-				description: formData.description.trim() || null,
+				description:
+					formData.description.trim() || null,
 				block_date: formData.block_date,
 				start_time: formData.start_time,
 				end_time: formData.end_time,
@@ -170,15 +180,17 @@ export default function ReservationBlockoutsPage() {
 			}
 
 			if (editingBlockoutId) {
-				const updatedBlockout = await updateReservationBlockout(
-					editingBlockoutId,
-					payload,
-				)
+				const updatedBlockout =
+					await updateReservationBlockout(
+						editingBlockoutId,
+						payload,
+					)
 
 				setBlockouts(previousBlockouts =>
 					sortBlockouts(
 						previousBlockouts.map(blockout =>
-							blockout.id === editingBlockoutId
+							blockout.id ===
+							editingBlockoutId
 								? updatedBlockout
 								: blockout,
 						),
@@ -193,7 +205,10 @@ export default function ReservationBlockoutsPage() {
 					await createReservationBlockout(payload)
 
 				setBlockouts(previousBlockouts =>
-					sortBlockouts([...previousBlockouts, newBlockout]),
+					sortBlockouts([
+						...previousBlockouts,
+						newBlockout,
+					]),
 				)
 
 				setSuccessMessage(
@@ -208,6 +223,7 @@ export default function ReservationBlockoutsPage() {
 					editingBlockoutId ? 'updating' : 'creating'
 				} reservation blockout: ${error.message}`,
 			)
+
 			setSuccessMessage('')
 		} finally {
 			setSaving(false)
@@ -248,6 +264,7 @@ export default function ReservationBlockoutsPage() {
 			setErrorMessage(
 				`Error deleting reservation blockout: ${error.message}`,
 			)
+
 			setSuccessMessage('')
 		} finally {
 			setDeletingBlockoutId(null)
@@ -258,6 +275,7 @@ export default function ReservationBlockoutsPage() {
 		<section className='admin-page reservation-blockouts-page'>
 			<div className='admin-page__header'>
 				<h1>Reservation Blockouts</h1>
+
 				<p>
 					Block dates and time ranges for tournaments,
 					maintenance, rentals, and special events.
@@ -265,7 +283,11 @@ export default function ReservationBlockoutsPage() {
 			</div>
 
 			<div className='admin-card'>
-				<h2>{isEditing ? 'Edit Blockout' : 'Add Blockout'}</h2>
+				<h2>
+					{isEditing
+						? 'Edit Blockout'
+						: 'Add Blockout'}
+				</h2>
 
 				<form
 					className='reservation-blockout-form'
@@ -301,7 +323,9 @@ export default function ReservationBlockoutsPage() {
 					</div>
 
 					<div className='form-group'>
-						<label htmlFor='description'>Description</label>
+						<label htmlFor='description'>
+							Description
+						</label>
 
 						<textarea
 							id='description'
@@ -381,7 +405,10 @@ export default function ReservationBlockoutsPage() {
 					</div>
 
 					<div className='form-actions'>
-						<button type='submit' disabled={saving}>
+						<button
+							type='submit'
+							disabled={saving}
+						>
 							{saving
 								? 'Saving...'
 								: isEditing
@@ -426,7 +453,8 @@ export default function ReservationBlockoutsPage() {
 					<div className='reservation-blockout-list'>
 						{blockouts.map(blockout => {
 							const isDeleting =
-								deletingBlockoutId === blockout.id
+								deletingBlockoutId ===
+								blockout.id
 
 							return (
 								<article
@@ -464,13 +492,19 @@ export default function ReservationBlockoutsPage() {
 
 										{blockout.reason && (
 											<p>
-												<strong>Reason:</strong>{' '}
+												<strong>
+													Reason:
+												</strong>{' '}
 												{blockout.reason}
 											</p>
 										)}
 
 										{blockout.description && (
-											<p>{blockout.description}</p>
+											<p>
+												{
+													blockout.description
+												}
+											</p>
 										)}
 									</div>
 
@@ -484,7 +518,8 @@ export default function ReservationBlockoutsPage() {
 												)
 											}
 											disabled={
-												saving || isDeleting
+												saving ||
+												isDeleting
 											}
 										>
 											Edit
@@ -494,10 +529,13 @@ export default function ReservationBlockoutsPage() {
 											type='button'
 											className='danger-button'
 											onClick={() =>
-												handleDelete(blockout)
+												handleDelete(
+													blockout,
+												)
 											}
 											disabled={
-												saving || isDeleting
+												saving ||
+												isDeleting
 											}
 										>
 											{isDeleting
@@ -512,7 +550,9 @@ export default function ReservationBlockoutsPage() {
 				)}
 			</div>
 
-			<ReservationAvailabilityPreview blockouts={blockouts} />
+			<ReservationAvailabilityPreview
+				blockouts={blockouts}
+			/>
 		</section>
 	)
 }

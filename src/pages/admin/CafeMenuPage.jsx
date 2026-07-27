@@ -16,14 +16,27 @@ const initialForm = {
 	display_order: 0,
 }
 
-const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+const ALLOWED_FILE_TYPES = [
+	'image/jpeg',
+	'image/png',
+	'image/webp',
+]
+
 const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024
 
 function sortItems(items) {
 	return [...items].sort((a, b) => {
-		const displayOrderCompare = Number(a.display_order ?? 0) - Number(b.display_order ?? 0)
-		if (displayOrderCompare !== 0) return displayOrderCompare
-		return String(a.name ?? '').localeCompare(String(b.name ?? ''))
+		const displayOrderCompare =
+			Number(a.display_order ?? 0) -
+			Number(b.display_order ?? 0)
+
+		if (displayOrderCompare !== 0) {
+			return displayOrderCompare
+		}
+
+		return String(a.name ?? '').localeCompare(
+			String(b.name ?? ''),
+		)
 	})
 }
 
@@ -40,14 +53,43 @@ export default function CafeMenuPage() {
 	const [successMessage, setSuccessMessage] = useState('')
 
 	const imagePreviewUrl = useMemo(() => {
-		if (!imageFile) return ''
+		if (!imageFile) {
+			return ''
+		}
+
 		return URL.createObjectURL(imageFile)
 	}, [imageFile])
 
 	const isEditing = Boolean(editingItemId)
 
 	useEffect(() => {
+		let isMounted = true
+
+		async function loadItems() {
+			try {
+				const data = await getCafeMenuItems()
+
+				if (isMounted) {
+					setItems(sortItems(data))
+				}
+			} catch (error) {
+				if (isMounted) {
+					setErrorMessage(
+						`Error loading menu items: ${error.message}`,
+					)
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false)
+				}
+			}
+		}
+
 		loadItems()
+
+		return () => {
+			isMounted = false
+		}
 	}, [])
 
 	useEffect(() => {
@@ -58,23 +100,13 @@ export default function CafeMenuPage() {
 		}
 	}, [imagePreviewUrl])
 
-	async function loadItems() {
-		try {
-			setLoading(true)
-			setErrorMessage('')
-
-			const data = await getCafeMenuItems()
-			setItems(sortItems(data))
-		} catch (error) {
-			setErrorMessage(`Error loading menu items: ${error.message}`)
-		} finally {
-			setLoading(false)
-		}
-	}
-
 	function clearFileInput() {
-		const fileInput = document.getElementById('menu-image')
-		if (fileInput) fileInput.value = ''
+		const fileInput =
+			document.getElementById('menu-image')
+
+		if (fileInput) {
+			fileInput.value = ''
+		}
 	}
 
 	function resetForm() {
@@ -86,23 +118,33 @@ export default function CafeMenuPage() {
 		clearFileInput()
 	}
 
+	function clearMessages() {
+		setErrorMessage('')
+		setSuccessMessage('')
+	}
+
 	function handleChange(event) {
 		const { name, value, type, checked } = event.target
 
-		setFormData(prev => ({
-			...prev,
+		setFormData(previousFormData => ({
+			...previousFormData,
 			[name]: type === 'checkbox' ? checked : value,
 		}))
 	}
 
 	function validateImageFile(file) {
-		if (!file) return 'Please choose an image.'
+		if (!file) {
+			return 'Please choose an image.'
+		}
+
 		if (!ALLOWED_FILE_TYPES.includes(file.type)) {
 			return 'Only JPG, PNG, and WEBP images are allowed.'
 		}
+
 		if (file.size > MAX_FILE_SIZE_BYTES) {
 			return 'Image must be 2 MB or smaller.'
 		}
+
 		return ''
 	}
 
@@ -124,8 +166,7 @@ export default function CafeMenuPage() {
 			return
 		}
 
-		setErrorMessage('')
-		setSuccessMessage('')
+		clearMessages()
 		setImageFile(file)
 	}
 
@@ -133,22 +174,22 @@ export default function CafeMenuPage() {
 		setEditingItemId(item.id)
 		setEditingImagePath(item.image_path || '')
 		setEditingImageUrl(item.image_url || '')
+
 		setFormData({
 			name: item.name || '',
 			description: item.description || '',
 			is_active: item.is_active ?? true,
 			display_order: item.display_order ?? 0,
 		})
+
 		setImageFile(null)
-		setErrorMessage('')
-		setSuccessMessage('')
+		clearMessages()
 		clearFileInput()
 	}
 
 	function handleCancelEdit() {
 		resetForm()
-		setErrorMessage('')
-		setSuccessMessage('')
+		clearMessages()
 	}
 
 	async function handleSubmit(event) {
@@ -165,40 +206,52 @@ export default function CafeMenuPage() {
 
 		try {
 			setSubmitting(true)
-			setErrorMessage('')
-			setSuccessMessage('')
+			clearMessages()
 
 			if (isEditing) {
-				let updatedItem = await updateCafeMenuItem(editingItemId, {
-					name: trimmedName,
-					description: trimmedDescription || null,
-					is_active: formData.is_active,
-					display_order: Number(formData.display_order) || 0,
-				})
+				let updatedItem =
+					await updateCafeMenuItem(editingItemId, {
+						name: trimmedName,
+						description:
+							trimmedDescription || null,
+						is_active: formData.is_active,
+						display_order:
+							Number(formData.display_order) || 0,
+					})
 
 				if (imageFile) {
-					updatedItem = await replaceCafeMenuItemImage(
-						editingItemId,
-						imageFile,
-						editingImagePath || null,
-					)
+					updatedItem =
+						await replaceCafeMenuItemImage(
+							editingItemId,
+							imageFile,
+							editingImagePath || null,
+						)
 				}
 
-				setItems(prev =>
-					sortItems(prev.map(item => (item.id === editingItemId ? updatedItem : item))),
+				setItems(previousItems =>
+					sortItems(
+						previousItems.map(item =>
+							item.id === editingItemId
+								? updatedItem
+								: item,
+						),
+					),
 				)
 
-				setSuccessMessage('Menu item updated successfully.')
+				setSuccessMessage(
+					'Menu item updated successfully.',
+				)
 			} else {
-				const fileValidationMessage = validateImageFile(imageFile)
+				const fileValidationMessage =
+					validateImageFile(imageFile)
 
 				if (fileValidationMessage) {
 					setErrorMessage(fileValidationMessage)
-					setSubmitting(false)
 					return
 				}
 
-				const { imagePath, imageUrl } = await uploadCafeMenuImage(imageFile)
+				const { imagePath, imageUrl } =
+					await uploadCafeMenuImage(imageFile)
 
 				const newItem = await createCafeMenuItem({
 					name: trimmedName,
@@ -206,16 +259,26 @@ export default function CafeMenuPage() {
 					image_path: imagePath,
 					image_url: imageUrl,
 					is_active: formData.is_active,
-					display_order: Number(formData.display_order) || 0,
+					display_order:
+						Number(formData.display_order) || 0,
 				})
 
-				setItems(prev => sortItems([...prev, newItem]))
-				setSuccessMessage('Menu item added successfully.')
+				setItems(previousItems =>
+					sortItems([...previousItems, newItem]),
+				)
+
+				setSuccessMessage(
+					'Menu item added successfully.',
+				)
 			}
 
 			resetForm()
 		} catch (error) {
-			setErrorMessage(`Error ${isEditing ? 'updating' : 'adding'} menu item: ${error.message}`)
+			setErrorMessage(
+				`Error ${
+					isEditing ? 'updating' : 'adding'
+				} menu item: ${error.message}`,
+			)
 			setSuccessMessage('')
 		} finally {
 			setSubmitting(false)
@@ -224,54 +287,90 @@ export default function CafeMenuPage() {
 
 	async function handleToggleActive(item) {
 		const confirmed = window.confirm(
-			`Are you sure you want to ${item.is_active ? 'deactivate' : 'reactivate'} "${item.name}"?`,
+			`Are you sure you want to ${
+				item.is_active ? 'deactivate' : 'reactivate'
+			} "${item.name}"?`,
 		)
 
-		if (!confirmed) return
+		if (!confirmed) {
+			return
+		}
 
 		try {
-			setErrorMessage('')
-			setSuccessMessage('')
+			clearMessages()
 
-			const updatedItem = await toggleCafeMenuItemActive(item.id, item.is_active)
+			const updatedItem =
+				await toggleCafeMenuItemActive(
+					item.id,
+					item.is_active,
+				)
 
-			setItems(prev => sortItems(prev.map(entry => (entry.id === item.id ? updatedItem : entry))))
+			setItems(previousItems =>
+				sortItems(
+					previousItems.map(entry =>
+						entry.id === item.id
+							? updatedItem
+							: entry,
+					),
+				),
+			)
 
 			if (editingItemId === item.id) {
-				setFormData(prev => ({
-					...prev,
+				setFormData(previousFormData => ({
+					...previousFormData,
 					is_active: updatedItem.is_active,
 				}))
 			}
 
 			setSuccessMessage(
-				`Menu item ${updatedItem.is_active ? 'reactivated' : 'deactivated'} successfully.`,
+				`Menu item ${
+					updatedItem.is_active
+						? 'reactivated'
+						: 'deactivated'
+				} successfully.`,
 			)
 		} catch (error) {
-			setErrorMessage(`Error changing menu item status: ${error.message}`)
+			setErrorMessage(
+				`Error changing menu item status: ${error.message}`,
+			)
 			setSuccessMessage('')
 		}
 	}
 
 	async function handleDelete(item) {
-		const confirmed = window.confirm(`Delete "${item.name}" permanently?\n\nThis cannot be undone.`)
+		const confirmed = window.confirm(
+			`Delete "${item.name}" permanently?\n\nThis cannot be undone.`,
+		)
 
-		if (!confirmed) return
+		if (!confirmed) {
+			return
+		}
 
 		try {
-			setErrorMessage('')
-			setSuccessMessage('')
+			clearMessages()
 
-			await deleteCafeMenuItem(item.id, item.image_path || null)
-			setItems(prev => prev.filter(entry => entry.id !== item.id))
+			await deleteCafeMenuItem(
+				item.id,
+				item.image_path || null,
+			)
+
+			setItems(previousItems =>
+				previousItems.filter(
+					entry => entry.id !== item.id,
+				),
+			)
 
 			if (editingItemId === item.id) {
 				resetForm()
 			}
 
-			setSuccessMessage('Menu item deleted successfully.')
+			setSuccessMessage(
+				'Menu item deleted successfully.',
+			)
 		} catch (error) {
-			setErrorMessage(`Error deleting menu item: ${error.message}`)
+			setErrorMessage(
+				`Error deleting menu item: ${error.message}`,
+			)
 			setSuccessMessage('')
 		}
 	}
@@ -280,15 +379,27 @@ export default function CafeMenuPage() {
 		<section className='admin-page cafe-menu-page'>
 			<div className='admin-page__header'>
 				<h1>Cafe Menu</h1>
-				<p>Add and manage full menu images without changing code.</p>
+
+				<p>
+					Add and manage full menu images without changing
+					code.
+				</p>
 			</div>
 
 			<div className='admin-card'>
-				<h2>{isEditing ? 'Edit Menu Item' : 'Add Menu Item'}</h2>
+				<h2>
+					{isEditing
+						? 'Edit Menu Item'
+						: 'Add Menu Item'}
+				</h2>
 
-				<form className='menu-form' onSubmit={handleSubmit}>
+				<form
+					className='menu-form'
+					onSubmit={handleSubmit}
+				>
 					<div className='form-group'>
 						<label htmlFor='name'>Menu Title</label>
+
 						<input
 							id='name'
 							name='name'
@@ -296,11 +407,15 @@ export default function CafeMenuPage() {
 							value={formData.name}
 							onChange={handleChange}
 							placeholder='Cafe Menu'
+							disabled={submitting}
 						/>
 					</div>
 
 					<div className='form-group'>
-						<label htmlFor='description'>Description</label>
+						<label htmlFor='description'>
+							Description
+						</label>
+
 						<textarea
 							id='description'
 							name='description'
@@ -308,12 +423,16 @@ export default function CafeMenuPage() {
 							value={formData.description}
 							onChange={handleChange}
 							placeholder='Optional description'
+							disabled={submitting}
 						/>
 					</div>
 
 					<div className='form-row'>
 						<div className='form-group'>
-							<label htmlFor='display_order'>Display Order</label>
+							<label htmlFor='display_order'>
+								Display Order
+							</label>
+
 							<input
 								id='display_order'
 								name='display_order'
@@ -321,6 +440,7 @@ export default function CafeMenuPage() {
 								min='0'
 								value={formData.display_order}
 								onChange={handleChange}
+								disabled={submitting}
 							/>
 						</div>
 
@@ -332,6 +452,7 @@ export default function CafeMenuPage() {
 									type='checkbox'
 									checked={formData.is_active}
 									onChange={handleChange}
+									disabled={submitting}
 								/>
 								Active
 							</label>
@@ -340,45 +461,90 @@ export default function CafeMenuPage() {
 
 					<div className='form-group'>
 						<label htmlFor='menu-image'>
-							{isEditing ? 'Replace Menu Image (Optional)' : 'Menu Image'}
+							{isEditing
+								? 'Replace Menu Image (Optional)'
+								: 'Menu Image'}
 						</label>
+
 						<input
 							id='menu-image'
 							type='file'
 							accept='image/png,image/jpeg,image/webp'
 							onChange={handleFileChange}
+							disabled={submitting}
 						/>
-						<small>Allowed: JPG, PNG, WEBP. Max size: 2 MB.</small>
+
+						<small>
+							Allowed: JPG, PNG, WEBP. Max size: 2 MB.
+						</small>
 					</div>
 
-					{isEditing && editingImageUrl && !imagePreviewUrl && (
-						<div className='image-preview'>
-							<p>Current Image</p>
-							<img src={editingImageUrl} alt={formData.name || 'Current menu item'} />
-						</div>
-					)}
+					{isEditing &&
+						editingImageUrl &&
+						!imagePreviewUrl && (
+							<div className='image-preview'>
+								<p>Current Image</p>
+
+								<img
+									src={editingImageUrl}
+									alt={
+										formData.name ||
+										'Current menu item'
+									}
+								/>
+							</div>
+						)}
 
 					{imagePreviewUrl && (
 						<div className='image-preview'>
-							<p>{isEditing ? 'New Image Preview' : 'Image Preview'}</p>
-							<img src={imagePreviewUrl} alt='Selected menu item preview' />
+							<p>
+								{isEditing
+									? 'New Image Preview'
+									: 'Image Preview'}
+							</p>
+
+							<img
+								src={imagePreviewUrl}
+								alt='Selected menu item preview'
+							/>
 						</div>
 					)}
 
 					<div className='form-actions'>
-						<button type='submit' disabled={submitting}>
-							{submitting ? 'Saving...' : isEditing ? 'Update Menu Item' : 'Add Menu Item'}
+						<button
+							type='submit'
+							disabled={submitting}
+						>
+							{submitting
+								? 'Saving...'
+								: isEditing
+									? 'Update Menu Item'
+									: 'Add Menu Item'}
 						</button>
 
 						{isEditing && (
-							<button type='button' className='secondary-button' onClick={handleCancelEdit}>
+							<button
+								type='button'
+								className='secondary-button'
+								onClick={handleCancelEdit}
+								disabled={submitting}
+							>
 								Cancel Edit
 							</button>
 						)}
 					</div>
 
-					{successMessage && <p className='status-message status-message--success'>{successMessage}</p>}
-					{errorMessage && <p className='status-message status-message--error'>{errorMessage}</p>}
+					{successMessage && (
+						<p className='status-message status-message--success'>
+							{successMessage}
+						</p>
+					)}
+
+					{errorMessage && (
+						<p className='status-message status-message--error'>
+							{errorMessage}
+						</p>
+					)}
 				</form>
 			</div>
 
@@ -393,7 +559,11 @@ export default function CafeMenuPage() {
 					<div className='menu-item-list'>
 						{items.map(item => (
 							<article
-								className={`menu-item-admin ${!item.is_active ? 'menu-item-admin--inactive' : ''}`}
+								className={`menu-item-admin ${
+									!item.is_active
+										? 'menu-item-admin--inactive'
+										: ''
+								}`}
 								key={item.id}
 							>
 								{item.image_url && (
@@ -406,35 +576,60 @@ export default function CafeMenuPage() {
 
 								<div className='menu-item-admin__content'>
 									<h3>{item.name}</h3>
+
 									<p>
-										<strong>Status:</strong> {item.is_active ? 'Active' : 'Inactive'}
+										<strong>Status:</strong>{' '}
+										{item.is_active
+											? 'Active'
+											: 'Inactive'}
 									</p>
+
 									<p>
-										<strong>Display Order:</strong> {item.display_order ?? 0}
+										<strong>
+											Display Order:
+										</strong>{' '}
+										{item.display_order ?? 0}
 									</p>
-									{item.description && <p>{item.description}</p>}
+
+									{item.description && (
+										<p>{item.description}</p>
+									)}
 
 									<div className='menu-item-admin__actions'>
 										<button
 											type='button'
 											className='edit-button'
-											onClick={() => handleEditClick(item)}
+											onClick={() =>
+												handleEditClick(item)
+											}
 										>
 											Edit
 										</button>
 
 										<button
 											type='button'
-											className={item.is_active ? 'warning-button' : 'success-button'}
-											onClick={() => handleToggleActive(item)}
+											className={
+												item.is_active
+													? 'warning-button'
+													: 'success-button'
+											}
+											onClick={() =>
+												handleToggleActive(
+													item,
+												)
+											}
 										>
-											{item.is_active ? 'Deactivate' : 'Reactivate'}
+											{item.is_active
+												? 'Deactivate'
+												: 'Reactivate'}
 										</button>
 
 										<button
 											type='button'
 											className='danger-button'
-											onClick={() => handleDelete(item)}
+											onClick={() =>
+												handleDelete(item)
+											}
 										>
 											Delete
 										</button>

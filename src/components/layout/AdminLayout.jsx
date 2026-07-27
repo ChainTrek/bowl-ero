@@ -1,36 +1,69 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import AdminSidebar from './AdminSidebar'
-import { useAuth } from '../../context/AuthContext'
+import useAuth from '../../context/useAuth'
 import { getAdminSidebarCounts } from '../../services/supabase/adminCounts'
 import bowleroLogo from '../../assets/bowlero-logo.png'
+
+const INITIAL_COUNTS = {
+	messages: 0,
+	reservationRequests: 0,
+	applications: 0,
+}
 
 export default function AdminLayout() {
 	const { user, logout } = useAuth()
 	const location = useLocation()
 
-	const [counts, setCounts] = useState({
-		messages: 0,
-		reservationRequests: 0,
-		applications: 0,
-	})
+	const [counts, setCounts] = useState(INITIAL_COUNTS)
 	const [loadingCounts, setLoadingCounts] = useState(true)
 
-	useEffect(() => {
-		refreshCounts()
-	}, [location.pathname])
-
-	async function refreshCounts() {
+	const refreshCounts = useCallback(async () => {
 		try {
 			setLoadingCounts(true)
+
 			const data = await getAdminSidebarCounts()
 			setCounts(data)
 		} catch (error) {
-			console.error('Unable to load admin sidebar counts:', error.message)
+			console.error(
+				'Unable to load admin sidebar counts:',
+				error.message,
+			)
 		} finally {
 			setLoadingCounts(false)
 		}
-	}
+	}, [])
+
+	useEffect(() => {
+		let isMounted = true
+
+		async function loadCountsForRoute() {
+			try {
+				const data = await getAdminSidebarCounts()
+
+				if (isMounted) {
+					setCounts(data)
+				}
+			} catch (error) {
+				if (isMounted) {
+					console.error(
+						'Unable to load admin sidebar counts:',
+						error.message,
+					)
+				}
+			} finally {
+				if (isMounted) {
+					setLoadingCounts(false)
+				}
+			}
+		}
+
+		loadCountsForRoute()
+
+		return () => {
+			isMounted = false
+		}
+	}, [location.pathname])
 
 	async function handleLogout() {
 		try {
@@ -42,12 +75,19 @@ export default function AdminLayout() {
 
 	return (
 		<div className='admin-layout'>
-			<AdminSidebar counts={counts} loadingCounts={loadingCounts} />
+			<AdminSidebar
+				counts={counts}
+				loadingCounts={loadingCounts}
+			/>
 
 			<main className='admin-layout__content'>
 				<div className='admin-topbar'>
 					<div>
-						<Link to='/' className='site-logo-link' aria-label='Go to home page'>
+						<Link
+							to='/'
+							className='site-logo-link'
+							aria-label='Go to home page'
+						>
 							<img
 								className='site-logo site-logo--admin'
 								src={bowleroLogo}
@@ -58,7 +98,10 @@ export default function AdminLayout() {
 						<p>Signed in as {user?.email}</p>
 					</div>
 
-					<button type='button' onClick={handleLogout}>
+					<button
+						type='button'
+						onClick={handleLogout}
+					>
 						Sign Out
 					</button>
 				</div>

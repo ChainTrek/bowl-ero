@@ -1,4 +1,9 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import Autoplay from 'embla-carousel-autoplay'
 import PublicPageShell from '../components/layout/PublicPageShell'
@@ -11,13 +16,20 @@ export default function CafePublicPage() {
 	const [errorMessage, setErrorMessage] = useState('')
 	const [selectedIndex, setSelectedIndex] = useState(0)
 
-	const autoplay = useRef(
-		Autoplay({
-			delay: 5000,
-			stopOnInteraction: false,
-			stopOnMouseEnter: true,
-			stopOnFocusIn: true,
-		}),
+	const autoplayPlugin = useMemo(
+		() =>
+			Autoplay({
+				delay: 5000,
+				stopOnInteraction: false,
+				stopOnMouseEnter: true,
+				stopOnFocusIn: true,
+			}),
+		[],
+	)
+
+	const carouselPlugins = useMemo(
+		() => (items.length > 1 ? [autoplayPlugin] : []),
+		[autoplayPlugin, items.length],
 	)
 
 	const [emblaRef, emblaApi] = useEmblaCarousel(
@@ -25,7 +37,7 @@ export default function CafePublicPage() {
 			loop: items.length > 1,
 			align: 'start',
 		},
-		items.length > 1 ? [autoplay.current] : [],
+		carouselPlugins,
 	)
 
 	useEffect(() => {
@@ -37,7 +49,9 @@ export default function CafePublicPage() {
 				const data = await getPublicCafeMenuItems()
 				setItems(data ?? [])
 			} catch (error) {
-				setErrorMessage(`Unable to load cafe menu: ${error.message}`)
+				setErrorMessage(
+					`Unable to load cafe menu: ${error.message}`,
+				)
 			} finally {
 				setLoading(false)
 			}
@@ -46,37 +60,43 @@ export default function CafePublicPage() {
 		loadMenuItems()
 	}, [])
 
-	const onSelect = useCallback(() => {
-		if (!emblaApi) return
+	const handleCarouselSelect = useCallback(() => {
+		if (!emblaApi) {
+			return
+		}
+
 		setSelectedIndex(emblaApi.selectedScrollSnap())
 	}, [emblaApi])
 
 	useEffect(() => {
-		if (!emblaApi) return
+		if (!emblaApi) {
+			return undefined
+		}
 
-		onSelect()
-		emblaApi.on('select', onSelect)
-		emblaApi.on('reInit', onSelect)
+		const animationFrameId = window.requestAnimationFrame(
+			handleCarouselSelect,
+		)
+
+		emblaApi.on('select', handleCarouselSelect)
+		emblaApi.on('reInit', handleCarouselSelect)
 
 		return () => {
-			emblaApi.off('select', onSelect)
-			emblaApi.off('reInit', onSelect)
+			window.cancelAnimationFrame(animationFrameId)
+			emblaApi.off('select', handleCarouselSelect)
+			emblaApi.off('reInit', handleCarouselSelect)
 		}
-	}, [emblaApi, onSelect])
+	}, [emblaApi, handleCarouselSelect])
 
-	function handlePrev() {
-		if (!emblaApi) return
-		emblaApi.scrollPrev()
+	function handlePrevious() {
+		emblaApi?.scrollPrev()
 	}
 
 	function handleNext() {
-		if (!emblaApi) return
-		emblaApi.scrollNext()
+		emblaApi?.scrollNext()
 	}
 
 	function handleDotClick(index) {
-		if (!emblaApi) return
-		emblaApi.scrollTo(index)
+		emblaApi?.scrollTo(index)
 	}
 
 	return (
@@ -85,36 +105,61 @@ export default function CafePublicPage() {
 			title='Cafe Menu'
 			description='Browse the cafe menu boards and see the current food and drink offerings.'
 		>
-			<PublicContentSection sectionClassName='cafe-menu-section' containerClassName='cafe-menu-section__inner'>
+			<PublicContentSection
+				sectionClassName='cafe-menu-section'
+				containerClassName='cafe-menu-section__inner'
+			>
 				{loading ? (
-					<p className='public-loading'>Loading menu...</p>
+					<p className='public-loading'>
+						Loading menu...
+					</p>
 				) : errorMessage ? (
 					<p className='public-error'>{errorMessage}</p>
 				) : items.length === 0 ? (
 					<div className='cafe-menu-section__empty public-card'>
-						<h2>No cafe menu is available right now.</h2>
-						<p>Please check back soon for updated menu boards and current offerings.</p>
+						<h2>
+							No cafe menu is available right now.
+						</h2>
+
+						<p>
+							Please check back soon for updated menu
+							boards and current offerings.
+						</p>
 					</div>
 				) : (
 					<div className='cafe-carousel'>
-						<div className='cafe-carousel__viewport' ref={emblaRef}>
+						<div
+							className='cafe-carousel__viewport'
+							ref={emblaRef}
+						>
 							<div className='cafe-carousel__container'>
 								{items.map(item => (
-									<div className='cafe-carousel__slide' key={item.id}>
+									<div
+										className='cafe-carousel__slide'
+										key={item.id}
+									>
 										<article className='cafe-slide-card'>
 											{item.image_url && (
 												<div className='cafe-slide-card__image-wrapper'>
 													<img
 														className='cafe-slide-card__image'
-														src={item.image_url}
-														alt={item.name}
+														src={
+															item.image_url
+														}
+														alt={
+															item.name
+														}
 													/>
 												</div>
 											)}
 
 											<div className='cafe-slide-card__details'>
-												<span className='cafe-slide-card__eyebrow'>Menu Board</span>
+												<span className='cafe-slide-card__eyebrow'>
+													Menu Board
+												</span>
+
 												<h2>{item.name}</h2>
+
 												<p className='cafe-slide-card__description'>
 													{item.description?.trim()
 														? item.description
@@ -129,7 +174,12 @@ export default function CafePublicPage() {
 
 						{items.length > 1 && (
 							<div className='cafe-carousel__controls'>
-								<button type='button' className='cafe-carousel__button' onClick={handlePrev}>
+								<button
+									type='button'
+									className='cafe-carousel__button'
+									onClick={handlePrevious}
+									aria-label='Show previous cafe menu item'
+								>
 									Previous
 								</button>
 
@@ -139,15 +189,33 @@ export default function CafePublicPage() {
 											key={item.id}
 											type='button'
 											className={`cafe-carousel__dot ${
-												index === selectedIndex ? 'cafe-carousel__dot--active' : ''
+												index ===
+												selectedIndex
+													? 'cafe-carousel__dot--active'
+													: ''
 											}`}
-											onClick={() => handleDotClick(index)}
-											aria-label={`Go to cafe item ${index + 1}`}
+											onClick={() =>
+												handleDotClick(index)
+											}
+											aria-label={`Go to cafe item ${
+												index + 1
+											}`}
+											aria-current={
+												index ===
+												selectedIndex
+													? 'true'
+													: undefined
+											}
 										/>
 									))}
 								</div>
 
-								<button type='button' className='cafe-carousel__button' onClick={handleNext}>
+								<button
+									type='button'
+									className='cafe-carousel__button'
+									onClick={handleNext}
+									aria-label='Show next cafe menu item'
+								>
 									Next
 								</button>
 							</div>

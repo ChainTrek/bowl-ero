@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 
 const NAV_LINKS = [
 	{ to: '/', label: 'Home', end: true },
@@ -13,11 +13,6 @@ const NAV_LINKS = [
 
 export default function PublicNavbar() {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-	const location = useLocation()
-
-	useEffect(() => {
-		setIsMobileMenuOpen(false)
-	}, [location.pathname])
 
 	useEffect(() => {
 		function handleResize() {
@@ -27,11 +22,14 @@ export default function PublicNavbar() {
 		}
 
 		window.addEventListener('resize', handleResize)
-		return () => window.removeEventListener('resize', handleResize)
+
+		return () => {
+			window.removeEventListener('resize', handleResize)
+		}
 	}, [])
 
 	function toggleMobileMenu() {
-		setIsMobileMenuOpen(prev => !prev)
+		setIsMobileMenuOpen(previousState => !previousState)
 	}
 
 	function closeMobileMenu() {
@@ -41,18 +39,28 @@ export default function PublicNavbar() {
 	return (
 		<header className='public-navbar'>
 			<div className='public-container public-navbar__inner'>
-				<Link to='/' className='public-navbar__brand' onClick={closeMobileMenu}>
+				<Link
+					to='/'
+					className='public-navbar__brand'
+					onClick={closeMobileMenu}
+				>
 					Bowl-Ero
 				</Link>
 
 				<button
 					type='button'
 					className={`public-navbar__toggle ${
-						isMobileMenuOpen ? 'public-navbar__toggle--open' : ''
+						isMobileMenuOpen
+							? 'public-navbar__toggle--open'
+							: ''
 					}`}
 					aria-expanded={isMobileMenuOpen}
 					aria-controls='public-site-navigation'
-					aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+					aria-label={
+						isMobileMenuOpen
+							? 'Close navigation menu'
+							: 'Open navigation menu'
+					}
 					onClick={toggleMobileMenu}
 				>
 					<span className='public-navbar__toggle-line' />
@@ -63,7 +71,9 @@ export default function PublicNavbar() {
 				<nav
 					id='public-site-navigation'
 					className={`public-navbar__nav ${
-						isMobileMenuOpen ? 'public-navbar__nav--open' : ''
+						isMobileMenuOpen
+							? 'public-navbar__nav--open'
+							: ''
 					}`}
 					aria-label='Public site navigation'
 				>
@@ -74,7 +84,11 @@ export default function PublicNavbar() {
 							end={link.end}
 							onClick={closeMobileMenu}
 							className={({ isActive }) =>
-								`public-navbar__link ${isActive ? 'public-navbar__link--active' : ''}`
+								`public-navbar__link ${
+									isActive
+										? 'public-navbar__link--active'
+										: ''
+								}`
 							}
 						>
 							{link.label}
